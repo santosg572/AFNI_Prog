@@ -10,19 +10,19 @@ The following tutorials will show you how to analyze a sample dataset with AFNI.
 
 **Start to Finish Analysis with AFNI**
 
-*    Introduction to AFNI
-*    AFNI Tutorial #1: Downloading the Data
-*    AFNI Tutorial #2: The Flanker Experiment
-*    AFNI Tutorial #3: Looking at the Data
-*    AFNI Tutorial #4: AFNI Commands and Preprocessing
-*    AFNI Tutorial #5: Statistics and Modeling
-*    AFNI Tutorial #6: Scripting
-*    AFNI Tutorial #7: Group Analysis
-*    AFNI Tutorial #8: ROI Analysis
-*    AFNI Tutorial #9: Surface-Based Analysis with SUMA
-*    Appendix A: Parametric Modulation in AFNI
-*    Appendix B: Analyzing Rat Data
-*    Appendix C: Highlighting Vs. Hiding Results
-*    Appendix D: Reporting Effect Sizes
+    Introduction to AFNI
+    AFNI Tutorial #1: Downloading the Data
+    AFNI Tutorial #2: The Flanker Experiment
+    AFNI Tutorial #3: Looking at the Data
+    AFNI Tutorial #4: AFNI Commands and Preprocessing
+    AFNI Tutorial #5: Statistics and Modeling
+    AFNI Tutorial #6: Scripting
+    AFNI Tutorial #7: Group Analysis
+    AFNI Tutorial #8: ROI Analysis
+    AFNI Tutorial #9: Surface-Based Analysis with SUMA
+    Appendix A: Parametric Modulation in AFNI
+    Appendix B: Analyzing Rat Data
+    Appendix C: Highlighting Vs. Hiding Results
+    Appendix D: Reporting Effect Sizes
 
 
