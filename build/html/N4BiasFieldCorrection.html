@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>N4BiasFieldCorrection &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="AFNI Preprocesamiento, QC y Análisis Seed‐based en Resting State" href="AFNI_Preprocesamiento.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="n4biasfieldcorrection">
+<h1>N4BiasFieldCorrection<a class="headerlink" href="#n4biasfieldcorrection" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/ANTsX/ANTs/wiki/N4BiasFieldCorrection">https://github.com/ANTsX/ANTs/wiki/N4BiasFieldCorrection</a></p>
+<p>Quick start
+Example call for human brain T1w:</p>
+<dl class="simple">
+<dt>N4BiasFieldCorrection -d 3 -v 1 -s 4 -b [ 180 ] -c [ 50x50x50x50, 0.0 ] </dt><dd><p>-i T1w.nii.gz -o [ corrected_T1w.nii.gz, T1w_BiasField.nii.gz ]</p>
+</dd>
+</dl>
+<p>If you have multi-component or time series data, do not use -d 4. Compute the bias field on a representative
+3D volume and apply it by dividing each component or measurement by the bias field. More on this below.</p>
+<p>Algorithm
+From the program usage:</p>
+<p>N4 is a variant of the popular N3 (nonparameteric nonuniform normalization) retrospective bias correction
+algorithm. Based on the assumption that the corruption of the low frequency bias field can be modeled as a
+convolution of the intensity histogram by a Gaussian, the basic algorithmic protocol is to iterate between
+deconvolving the intensity histogram by a Gaussian, remapping the intensities, and then spatially smoothing
+this result by a B-spline modeling of the bias field itself.</p>
+<p>The original N3 paper explains the fundamentals in detail. The N4 paper explains the improvements and
+additions that have been implemented in ANTs.</p>
+<p>Basic usage options
+The default parameters are optimized for correcting human brain T1w images. The initial spline spacing
+should always be set explicitly. For human brain images, this should generally be somewhere between 100 and
+200 mm.</p>
+<p>Spline spacing (-b)
+The spline spacing can be set as a single number in mm, for isotropic spacing, or as a mesh resolution in
+each dimension. The image will be padded to fit an integer number of spacings into the image domain. Smaller
+spacing allows the bias field to be more detailed.</p>
+<p>The spacing parameter interacts with the convergence parameter: the spline spacing is doubled at each level,
+so -b [ 100 ] -c [ 50x20, 0.0 ] runs 50 iterations with 100mm spacing, then 20 with 50mm spacing.</p>
+<p>The second parameter to -b is the spline order. The default is 3, so -b [ 180 ] is equivalent to -b [ 180, 3
+], which is sufficient for most uses.</p>
+<p>Convergence (-c)
+The convergence option allows the user to set the number of multi-resolution iterations, and a convergence
+parameter which can halt execution of each level. The number of iterations and levels should be chosen to
+find a good solution without overfitting or taking too much time. The default is equivalent to -c [
+50x50x50x50, 0.0 ].</p>
+<p>Shrink factor (-s)
+The input image is downsampled by an integer shrink factor to speed up processing. The default is 4. The
+corrected image and bias field are output at full resolution.</p>
+<p>Masking (-x, -w)
+Masks restrict the voxels in which the image histogram is sampled. The -x option requires a binary mask.
+Only voxels inside the mask are corrected in the output image. If this is not desired, use -w. The -w option
+takes a weight image which does not have to be binary. For example, a smoothed brain mask, or tissue
+probabilities.</p>
+<p>Usage for time-series or multi-component data
+Using -d 4 fits a 4D, or time-varying, bias field, which will require optimization of the spline parameters
+across space and time. Unless you really want to pursue this strategy, it is better to compute a static bias
+field on a representative 3D image. This is commonly done to improve inter-modality registration.</p>
+<p>If you want to correct the time series itself, you can save the 3D bias field and apply it to all volumes /
+components of the data set. The bias-corrected image is the input image divided by the bias field.</p>
+<p>Averaging time series data
+The average image from a time series can be computed with antsMotionCorr.</p>
+<p>Averaging dMRI data
+Because diffusion images have strongly varying contrast between gradients, it’s best to use either the first
+unweighted (b=0) volume or the average of several b=0 volumes.</p>
+<p>N4 is used by the dwibiascorrect program in mrtrix. The default parameters are -b [ 100, 3 ] -c [ 1000, 0.0
+] -s 4. This fits a relatively smooth bias field compared to the N4 defaults for structural images.</p>
+<p>Troubleshooting
+Intensity outliers and negative values
+Because the bias correction operates in the log domain, the input images need to be positive. Non-positive
+background values can be removed from the computation by using a mask.</p>
+<p>Outlier intensities can also cause problems for the intensity histogram. Winsorizing these can improve
+performance.</p>
+<p>Out of memory errors
+This usually happens in HPC environments where memory usage is limited. Padding of the image does increase
+memory use, but it is usually only a problem if the image is of very high resolution, or the spline distance
+is set inappropriately (eg, using -b [ 200 ] on a mouse brain).</p>
+<p>Wrong dimensionality
+Using -d 4 to compute a bias field is likely to lead to strange results unless you really want a
+time-varying bias field and can optimize the spline parameters in all four dimensions. Likewise, for a time
+series of 2D images, use -d 2 and apply the bias field to each slice.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="AFNI_Preprocesamiento.html">AFNI Preprocesamiento, QC y Análisis Seed‐based en Resting State</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">N4BiasFieldCorrection</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="AFNI_Preprocesamiento.html" title="previous chapter">AFNI Preprocesamiento, QC y Análisis Seed‐based en Resting State</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/N4BiasFieldCorrection.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -10,10 +10,12 @@ Welcome to Numerical_Analysis_2E_Walter's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   AFNI_Preprocesamiento
-   N4BiasFieldCorrection
-   afni_andy/index2
-
+   intro
+   introB
+   tut01
+   tut02
+   tut03
+   tut04
 
 Indices and tables
 ==================

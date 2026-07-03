@@ -11,6 +11,7 @@ Welcome to Numerical_Analysis_2E_Walter's documentation!
    :caption: Contents:
 
    AFNI_Preprocesamiento
+   N4BiasFieldCorrection
 
 
 Indices and tables

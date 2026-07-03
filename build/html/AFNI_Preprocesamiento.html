@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>AFNI Preprocesamiento, QC y Análisis Seed‐based en Resting State &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
     <script src="_static/documentation_options.js?v=f2a433a1"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="N4BiasFieldCorrection" href="N4BiasFieldCorrection.html" />
     <link rel="prev" title="Welcome to Numerical_Analysis_2E_Walter’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -33,6 +35,7 @@
             
   <section id="afni-preprocesamiento-qc-y-analisis-seedbased-en-resting-state">
 <h1>AFNI Preprocesamiento, QC y Análisis Seed‐based en Resting State<a class="headerlink" href="#afni-preprocesamiento-qc-y-analisis-seedbased-en-resting-state" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/neuropsytox/Documentation/wiki/AFNI-Preprocesamiento,-QC-y-An%C3%A1lisis-Seed%E2%80%90based-en-Resting-State">https://github.com/neuropsytox/Documentation/wiki/AFNI-Preprocesamiento,-QC-y-An%C3%A1lisis-Seed%E2%80%90based-en-Resting-State</a></p>
 <p><strong>Primero correr cada sujeto en Freesurfer</strong></p>
 <p>Se corre un N4 para mejorar el contraste.</p>
 <div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>fsl_sub<span class="w"> </span>-N<span class="w"> </span>N4afni<span class="w"> </span>N4BiasFieldCorrection<span class="w"> </span>-d<span class="w"> </span><span class="m">3</span><span class="w"> </span>-i<span class="w"> </span>sub-112_T1w.nii<span class="w"> </span>-o<span class="w"> </span>sub-112_T1w_N4.nii
@@ -47,8 +50,412 @@
 <span class="k">do</span>
 <span class="w">   </span>fsl_sub<span class="w"> </span>-N<span class="w"> </span>N4afni<span class="si">${</span><span class="nv">suj</span><span class="si">}</span><span class="w"> </span>N4BiasFieldCorrection<span class="w"> </span>-d<span class="w"> </span><span class="m">3</span><span class="w"> </span>-i<span class="w"> </span><span class="nv">$data</span>/<span class="nv">$suj</span>/anat/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>_T1w.nii.gz<span class="w"> </span>-o<span class="w"> </span><span class="nv">$data</span>/<span class="nv">$suj</span>/anat/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>_T1w_N4.nii.gz
 <span class="k">done</span>
+
+./bash<span class="w"> </span>01_runN4
 </pre></div>
 </div>
+<p><strong>Cargar el modulo Freesurfer</strong></p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>freesurfer/7.4.1
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">SUBJECTS_DIR</span><span class="o">=</span>/path/to/data/derivatives/freesurfer
+
+fsl_sub<span class="w"> </span>-N<span class="w"> </span>sub-112<span class="w"> </span>recon-all<span class="w"> </span>-subject<span class="w"> </span>sub-112<span class="w"> </span>-i<span class="w"> </span>/path/sub-112_T1w_N4.nii<span class="w"> </span>-all
+</pre></div>
+</div>
+<p><strong>Ejemplo de script en Cluster C13:</strong></p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>freesurfer/7.4.1<span class="w"> </span>fsl/6.0.7.4<span class="w"> </span>afni/25.2.13<span class="w"> </span>ANTs/2.4.4
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">SUBJECTS_DIR</span><span class="o">=</span>/misc/tezca/egarza/afni_practice2025/derivatives_raw20/raw20fs
+<span class="nb">export</span><span class="w"> </span><span class="nv">data</span><span class="o">=</span>/misc/tezca/egarza/afni_practice2025/raw20
+
+<span class="k">for</span><span class="w"> </span>suj<span class="w"> </span><span class="k">in</span><span class="w"> </span>sub-020<span class="w"> </span>sub-021<span class="w"> </span>sub-022<span class="w"> </span>sub-023<span class="w"> </span>sub-024<span class="w"> </span>sub-025<span class="w"> </span>sub-025<span class="w"> </span>sub-026<span class="w"> </span>sub-027<span class="w">       </span><span class="se">\</span>
+<span class="w">   </span>sub-028<span class="w"> </span>sub-029<span class="w"> </span>sub-030<span class="w"> </span>sub-031<span class="w"> </span>sub-032<span class="w"> </span>sub-033<span class="w"> </span>sub-034<span class="w"> </span>sub-035<span class="w"> </span>sub-036<span class="w"> </span>sub-038<span class="w"> </span>sub-091<span class="w"> </span>sub-093<span class="p">;</span>
+<span class="k">do</span>
+<span class="w">   </span>fsl_sub<span class="w"> </span>-N<span class="w"> </span>fs<span class="si">${</span><span class="nv">suj</span><span class="si">}</span><span class="w"> </span>recon-all<span class="w"> </span>-all<span class="w"> </span>-subject<span class="w"> </span><span class="si">${</span><span class="nv">suj</span><span class="si">}</span><span class="w">        </span><span class="se">\</span>
+<span class="w">       </span>-i<span class="w"> </span><span class="nv">$data</span>/<span class="nv">$suj</span>/anat/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>_T1w_N4.nii.gz
+<span class="k">done</span>
+
+./bash<span class="w"> </span>02_runfs
+</pre></div>
+</div>
+<p><strong>Convertir de Freesurfer a SUMA</strong></p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>@SUMA_Make_Spec_FS<span class="w"> </span>-sid<span class="w"> </span>sub-20<span class="w"> </span>-NIFTI
+</pre></div>
+</div>
+<p><strong>Ejemplo de script en Cluster C13:</strong></p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+module<span class="w"> </span>load<span class="w"> </span>freesurfer/7.4.1<span class="w"> </span>fsl/6.0.7.4<span class="w"> </span>afni/25.2.13<span class="w"> </span>ANTs/2.4.4
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">data</span><span class="o">=</span>/misc/tezca/egarza/afni_practice2025/derivatives_raw20/raw20fs
+
+<span class="k">for</span><span class="w"> </span>suj<span class="w"> </span><span class="k">in</span><span class="w"> </span>sub-020<span class="w"> </span>sub-021<span class="w"> </span>sub-022<span class="w"> </span>sub-023<span class="w"> </span>sub-024<span class="w"> </span>sub-025<span class="w">  </span><span class="se">\</span>
+<span class="w">   </span>sub-025<span class="w"> </span>sub-026<span class="w"> </span>sub-027<span class="w"> </span>sub-028<span class="w"> </span>sub-029<span class="w"> </span>sub-030<span class="w"> </span>sub-031<span class="w"> </span>sub-032<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>sub-033<span class="w"> </span>sub-034<span class="w"> </span>sub-035<span class="w"> </span>sub-036<span class="w"> </span>sub-038<span class="w"> </span>sub-091<span class="w"> </span>sub-093<span class="p">;</span>
+
+<span class="k">do</span>
+<span class="w">   </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">data</span><span class="si">}</span>/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>
+<span class="w">   </span>fsl_sub<span class="w"> </span>-N<span class="w"> </span>FS2SUMA_<span class="nv">$suj</span><span class="w"> </span>@SUMA_Make_Spec_FS<span class="w"> </span>-sid<span class="w"> </span><span class="si">${</span><span class="nv">suj</span><span class="si">}</span><span class="w"> </span>-NIFTI
+<span class="k">done</span>
+
+./bash<span class="w"> </span>03_runFS2SUMA
+</pre></div>
+</div>
+<p><strong>Revisa los resultados de Freesurfer con SUMA</strong></p>
+<p>Dentro del folder de SUMA donde convertiste todo de Freesurfer&gt;</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>afni<span class="w"> </span>-niml<span class="w"> </span><span class="p">&amp;</span><span class="w"> </span>suma<span class="w"> </span>-spec<span class="w"> </span>std.141.sub-112_both.spec<span class="w"> </span>-sv<span class="w"> </span>sub-112_SurfVolcopy.nii
+</pre></div>
+</div>
+<p>Me salía un error por usar AFNI viejo del cluster C13. Tuve que convertir el NIFTI para que no tuviera un
+problema de header.</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>3drefit<span class="w"> </span>-newid<span class="w"> </span>sub-111_SurfVol.nii
+</pre></div>
+</div>
+<p>o</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>3dcopy<span class="w"> </span>sub-112_SurfVol.nii<span class="w"> </span>sub-112_SurfVolcopy.nii
+</pre></div>
+</div>
+<p><strong>Correr un SSWarper</strong></p>
+<p>Antes de correr afni_proc.py correr este SSWarper para obtener transformaciones y cerebro T1w sin craneo. Se
+corre con el comando siguiente, se puede hacer como script.</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>tcsh<span class="w"> </span>SSwarper
+</pre></div>
+</div>
+<p>Primero creo un folder dentro de <strong>derivatives_raw20</strong> llamado <strong>afniproc</strong>. Dentro, creo un folder llamado
+<strong>AFNI_01_SSWarp</strong></p>
+<p>Script</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+module<span class="w"> </span>load<span class="w"> </span>freesurfer/7.4.1<span class="w"> </span>fsl/6.0.7.4<span class="w"> </span>afni/25.2.13<span class="w"> </span>ANTs/2.4.4
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">data</span><span class="o">=</span>/misc/tezca/egarza/afni_practice2025/raw20
+<span class="nb">export</span><span class="w"> </span><span class="nv">derivatives</span><span class="o">=</span>/tezca/egarza/afni_practice2025/derivatives_raw20
+<span class="nb">export</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>/misc/tezca/egarza/afni_practice2025/derivatives_raw20/afniproc/AFNI_01_SSWarp
+
+<span class="k">for</span><span class="w"> </span>suj<span class="w"> </span><span class="k">in</span><span class="w"> </span>sub-021<span class="w"> </span>sub-022<span class="w"> </span>sub-023<span class="w"> </span>sub-024<span class="w"> </span>sub-025<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>sub-025<span class="w"> </span>sub-026<span class="w"> </span>sub-027<span class="w"> </span>sub-028<span class="w"> </span>sub-029<span class="w"> </span>sub-030<span class="w"> </span>sub-031<span class="w"> </span>sub-032<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>sub-033<span class="w"> </span>sub-034<span class="w"> </span>sub-035<span class="w"> </span>sub-036<span class="w"> </span>sub-038<span class="w"> </span>sub-091<span class="p">;</span>
+<span class="k">do</span>
+
+<span class="w">  </span>fsl_sub<span class="w"> </span>-N<span class="w"> </span>SSWarper_<span class="si">${</span><span class="nv">suj</span><span class="si">}</span><span class="w"> </span>@SSwarper<span class="w"> </span>-input<span class="w"> </span><span class="si">${</span><span class="nv">data</span><span class="si">}</span>/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>/anat/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>_T1w_N4.nii.gz<span class="w">       </span><span class="se">\</span>
+<span class="w">                 </span>-subid<span class="w"> </span><span class="si">${</span><span class="nv">output</span><span class="si">}</span>/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span><span class="w">     </span><span class="se">\</span>
+<span class="w">                 </span>-odir<span class="w">  </span><span class="si">${</span><span class="nv">output</span><span class="si">}</span>/<span class="si">${</span><span class="nv">suj</span><span class="si">}</span>_anat_warped<span class="w"> </span><span class="se">\</span>
+<span class="w">                 </span>-base<span class="w">  </span>MNI152_2009_template_SSW.nii.gz
+
+<span class="k">done</span>
+
+./bash<span class="w"> </span>04_runSSWarper
+</pre></div>
+</div>
+<p>Correr AFNI PROC
+Al correr afni_proc.py se corre automaticamente el Quality Control.</p>
+<p>Se tiene que estar seguro donde estan los archivos, ya sea ponerlos todos en el mismo folder o solo dar los
+paths correctos.</p>
+<p>Primero se crea un script. Hay muchos ejemplos en la página de AFNI, este script lo modifiqué de este:
+<a class="reference external" href="https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/programs/alpha/afni_proc.py_sphx.html#example-11-resting-state-analysis-now-even-more-modern">https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/programs/alpha/afni_proc.py_sphx.html#example-11-resting-state-analysis-now-even-more-modern</a></p>
+<p>Creo un folder dentro de afniproc llamado AFNI_02_rest y copio dentro el siguiente script:</p>
+<p>#!/bin/tcsh</p>
+<p>#module load freesurfer/7.4.1 fsl/6.0.7.4 afni/25.2.13 ANTs/2.4.4</p>
+<p># ————————————————–
+# note fixed top-level directories</p>
+<p>set SUMA=/misc/tezca/egarza/afni_practice2025/derivatives_raw20/raw20fs/
+set warp=/misc/tezca/egarza/afni_practice2025/derivatives_raw20/afniproc/AFNI_01_SSWarp/
+set data_root = /misc/tezca/egarza/afni_practice2025/
+set input_root = $data_root/raw20
+set output_root = $data_root/derivatives_raw20/afniproc/AFNI_02_rest</p>
+<p>set subjects = (sub-021 sub-022 sub-023 sub-024 sub-025 sub-025 sub-026 sub-027 sub-028 sub-029 sub-030 sub-031 sub-032 sub-033 sub-034 sub-035 sub-036 sub-038 sub-091)</p>
+<p># process all subjects</p>
+<p>foreach suj ($subjects)</p>
+<p>#sub-022 sub-023 sub-024 sub-025  #sub-025 sub-026 sub-027 sub-028 sub-029 sub-030 sub-031 sub-032 #sub-033 sub-034 sub-035 sub-036 sub-038 sub-091;</p>
+<dl>
+<dt># ————————————————–</dt><dd><p># note input and output directories
+set subj_indir = $input_root/$suj/func
+set subj_outdir = $output_root/$suj</p>
+</dd>
+<dt># ————————————————–</dt><dd><p># if output dir exists, this subject has already been processed
+if ( -d $subj_outdir ) then</p>
+<blockquote>
+<div><p>echo “** results dir already exists, skipping subject $suj”
+continue</p>
+</div></blockquote>
+<p>endif</p>
+</dd>
+<dt># ————————————————–</dt><dd><p># otherwise create the output directory, write an afni_proc.py
+# command to it, and fire it up</p>
+<p>mkdir -p $subj_outdir
+cd $subj_outdir</p>
+</dd>
+<dt># create a run.afni_proc script in this directory</dt><dd><p>cat &gt; run.afni_proc &lt;&lt; EOF</p>
+</dd>
+<dt>afni_proc.py                                                         </dt><dd><dl class="option-list">
+<dt><kbd><span class="option">-s<var>ubj_id</var></span></kbd></dt>
+<dd><p>${suj}.rest                             </p>
+</dd>
+<dt><kbd><span class="option">-b<var>locks</var></span></kbd></dt>
+<dd><p>despike tshift align tlrc volreg blur  mask scale regress                     </p>
+</dd>
+<dt><kbd><span class="option">-r<var>adial_correlate_blocks</var></span></kbd></dt>
+<dd><p>tcat volreg regress                    </p>
+</dd>
+<dt><kbd><span class="option">-c<var>opy_anat</var></span></kbd></dt>
+<dd><p>$warp/${suj}_anat_warped/anatSS.${suj}.nii                          </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_has_skull</var></span></kbd></dt>
+<dd><p>no                                     </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_follower</var></span></kbd></dt>
+<dd><p>anat_w_skull anat $warp/${suj}_anat_warped/anatU.${suj}.nii         </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_follower_ROI</var></span></kbd></dt>
+<dd><p>aaseg anat                             $SUMA/${suj}/SUMA/aparc.a2009s+aseg_REN_all.nii.gz       </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_follower_ROI</var></span></kbd></dt>
+<dd><p>aeseg epi                              $SUMA/${suj}/SUMA/aparc.a2009s+aseg_REN_all.nii.gz       </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_follower_ROI</var></span></kbd></dt>
+<dd><p>FSvent epi $SUMA/${suj}/SUMA/fs_ap_latvent.nii.gz        </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_follower_ROI</var></span></kbd></dt>
+<dd><p>FSWe epi $SUMA/${suj}/SUMA/fs_ap_wm.nii.gz               </p>
+</dd>
+<dt><kbd><span class="option">-a<var>nat_follower_erode</var></span></kbd></dt>
+<dd><p>FSvent FSWe                            </p>
+</dd>
+<dt><kbd><span class="option">-d<var>sets</var></span></kbd></dt>
+<dd><p>$subj_indir/${suj}_task-rest_bold.nii.gz                    </p>
+</dd>
+<dt><kbd><span class="option">-a<var>lign_unifize_epi</var></span></kbd></dt>
+<dd><p>local                                  </p>
+</dd>
+<dt><kbd><span class="option">-a<var>lign_opts_aea</var></span></kbd></dt>
+<dd><p>-cost lpc+ZZ                           -giant_move                            -check_flip                            </p>
+</dd>
+<dt><kbd><span class="option">-t<var>lrc_base</var></span></kbd></dt>
+<dd><p>MNI152_2009_template_SSW.nii.gz        </p>
+</dd>
+<dt><kbd><span class="option">-t<var>lrc_NL_warp</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-t<var>lrc_NL_warped_dsets</var></span></kbd></dt>
+<dd><p>$warp/${suj}_anat_warped/anatQQ.${suj}.nii</p>
+</dd>
+</dl>
+</dd>
+<dt>$warp/${suj}_anat_warped/anatQQ.${suj}.aff12.1D       </dt><dd><blockquote>
+<div><p>$warp/${suj}_anat_warped/anatQQ.${suj}_WARP.nii                     </p>
+</div></blockquote>
+<dl class="option-list">
+<dt><kbd><span class="option">-v<var>olreg_align_to</var></span></kbd></dt>
+<dd><p>MIN_OUTLIER                            </p>
+</dd>
+<dt><kbd><span class="option">-v<var>olreg_align_e2a</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-v<var>olreg_tlrc_warp</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-m<var>ask_epi_anat</var></span></kbd></dt>
+<dd><p>yes                                    </p>
+</dd>
+<dt><kbd><span class="option">-b<var>lur_size</var></span></kbd></dt>
+<dd><p>4                                      </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_apply_mot_types</var></span></kbd></dt>
+<dd><p>demean deriv                           </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_motion_per_run</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_anaticor_fast</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_anaticor_label</var></span></kbd></dt>
+<dd><p>FSWe                                   </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_ROI_PC</var></span></kbd></dt>
+<dd><p>FSvent 3                               </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_ROI_PC_per_run</var></span></kbd></dt>
+<dd><p>FSvent                                 </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_censor_motion</var></span></kbd></dt>
+<dd><p>0.2                                    </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_censor_outliers</var></span></kbd></dt>
+<dd><p>0.05                                   </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_make_corr_vols</var></span></kbd></dt>
+<dd><p>aeseg FSvent                           </p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_est_blur_epits</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-r<var>egress_est_blur_errts</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+<dt><kbd><span class="option">-h<var>tml_review_style</var></span></kbd></dt>
+<dd><p>pythonic</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>EOF
+# EOF terminates the ‘cat &gt; run.afni_proc’ command, above
+# (it must not be indented in the script)</p>
+<blockquote>
+<div><p># now run the analysis (generate proc and execute)
+tcsh run.afni_proc</p>
+</div></blockquote>
+<p># end loop over subjects
+end
+Después se corre el script así:</p>
+<p>tcsh afniproc_raw</p>
+<p>Correr Preprocesamiento
+Este script crea el script final para correr el preprocesamiento completo</p>
+<p>fsl_sub -N sub20afniproc tcsh -xef proc.sub-020.rest <a href="#id1"><span class="problematic" id="id2">|</span></a>&amp; tee output.proc.sub-020.rest</p>
+<p>En forma de script para muchos sujetos:</p>
+<p>for suj in sub-021 sub-022 sub-023 sub-024 sub-025 sub-026 sub-027 sub-028 sub-029 sub-030 sub-031 sub-032
+sub-033 sub-034 sub-035 sub-036 sub-038 sub-091; do fsl_sub -N afniproc_$suj tcsh -xef $suj/proc.$suj.rest
+2&gt;&amp;1 | tee $suj/output.proc.$suj.rest; done
+Quality Control
+Para entender el QC, pueden revisar esta página:
+<a class="reference external" href="https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/tutorials/apqc_html/apqc_ex1.html">https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/tutorials/apqc_html/apqc_ex1.html</a></p>
+<p>open_apqc.py -infiles QC_*/index.html
+Extracción de GCOR
+Corregir Global Signal es aún un gran tema y soy partidario de no hacerlo, pero hay que hacer algo para
+seguir corrigiendo por señales fisiológicas y movimiento. En AFNI recomiendan GCOR. Este se extrae ya de
+afni_proc.py:</p>
+<p>grep GCOR sub-<em>.rest.results/out.ss_review.</em>.txt  | awk ‘{print $5}’ &gt; GCOR.txt
+Generar semilla del PCC
+for suj in sub-021 sub-022 sub-023 sub-024 sub-025 sub-026 sub-027  sub-028 sub-029 sub-030 sub-031 sub-032 sub-033 sub-034 sub-035 sub-036 sub-038 sub-091;do 3dUndump -prefix seeds/${suj}-lh-PCC-BA31  -master $suj.rest.results/errts.$suj.rest.fanaticor+tlrc. -srad 5 -xyz lh-PCC-BA31.txt; done
+Generar mapa de semilla por sujeto
+#!/bin/bash</p>
+<p>module load freesurfer/7.4.1 fsl/6.0.7.4 afni/25.2.13 ANTs/2.4.4</p>
+<p>export data=/misc/tezca/egarza/afni_practice2025/raw20
+export derivatives=/tezca/egarza/afni_practice2025/derivatives_raw20
+export output=/misc/tezca/egarza/afni_practice2025/derivatives_raw20/afniproc/AFNI_02_rest</p>
+<p>for suj in sub-021 sub-022 sub-023 sub-024 sub-025 sub-026 sub-027  sub-028 sub-029 sub-030 sub-031 sub-032 sub-033 sub-034 sub-035 sub-036 sub-038 sub-091;</p>
+<p>do</p>
+<p>fsl_sub -N CORR-PCC-$suj 3dNetCorr -inset $output/${suj}.rest.results/errts.${suj}.rest.fanaticor+tlrc  -in_rois seeds/${suj}-lh-PCC-BA31+tlrc  -ts_wb_corr -ts_wb_Z -ts_out -ts_indiv -prefix $output/${suj}.rest.results/${suj}.CORR-PCC</p>
+<p>done
+Generar mapa de conectividad media
+Se puede sacar una lista fácilmente:</p>
+<p>ls sub-<em>.rest.results/sub-</em>.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD</p>
+<p>luego copiar esto a un script</p>
+<p>touch meanCorr.sh</p>
+<p>3dMean -prefix meanCorr sub-021.rest.results/sub-021.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-022.rest.results/sub-022.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-023.rest.results/sub-023.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-024.rest.results/sub-024.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-025.rest.results/sub-025.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-026.rest.results/sub-026.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-027.rest.results/sub-027.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-028.rest.results/sub-028.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-029.rest.results/sub-029.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-030.rest.results/sub-030.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-031.rest.results/sub-031.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-032.rest.results/sub-032.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-033.rest.results/sub-033.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-034.rest.results/sub-034.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-035.rest.results/sub-035.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-036.rest.results/sub-036.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-038.rest.results/sub-038.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD       sub-091.rest.results/sub-091.CORR-PCC_000_INDIV/WB_CORR_ROI_001+tlrc.HEAD
+bash meanCorr.sh</p>
+<p>Al final obtenemos un mapa de la correlación Promedio de los sujetos. Esto solo para fines de visualización.</p>
+<p>meanCorr</p>
+<p>Análisis
+Ya con todos los mapas de correlacion en Z para análisis, se debe escoger el tipo de análisis. Para este
+ejemplo, usaré 3dttest++ ya que es una comparación simple entre grupos.</p>
+<dl>
+<dt>3dttest++ -prefix stat.ttest                         </dt><dd><dl class="option-list">
+<dt><kbd><span class="option">-A<var>minusB</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>-setA CN                                   </dt><dd><p>sub-021 “sub-021.rest.results/sub-021.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-022 “sub-022.rest.results/sub-022.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-028 “sub-028.rest.results/sub-028.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-029 “sub-029.rest.results/sub-029.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-031 “sub-031.rest.results/sub-031.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-032 “sub-032.rest.results/sub-032.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-033 “sub-033.rest.results/sub-033.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-036 “sub-036.rest.results/sub-036.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-038 “sub-038.rest.results/sub-038.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    </p>
+</dd>
+<dt>-setB SU                                   </dt><dd><p>sub-023 “sub-023.rest.results/sub-023.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-024 “sub-024.rest.results/sub-024.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-025 “sub-025.rest.results/sub-025.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-026 “sub-026.rest.results/sub-026.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-027 “sub-027.rest.results/sub-027.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-030 “sub-030.rest.results/sub-030.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-034 “sub-034.rest.results/sub-034.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-035 “sub-035.rest.results/sub-035.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-091 “sub-091.rest.results/sub-091.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    </p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>bash ttest_2</p>
+<p>Al final ya nos da el archivo stat.ttest+tlrc que podemos abrir con AFNI para revisar los resultados.</p>
+<p>Con Covariables
+Crear lista de sujetos</p>
+<p>grep subject sub-<em>.rest.results/out.ss_review.</em>.txt  | awk ‘{print $4}’ &gt; subjects.txt
+Crear lista de valores GCOR (En este ejemplo usaremos GCOR que es el Global Signal Media de cada sujeto,
+pero puede ser edad o cualquier otra variable)</p>
+<p>grep GCOR sub-<em>.rest.results/out.ss_review.</em>.txt  | awk ‘{print $5}’ &gt; GCOR.txt
+Combinar</p>
+<p>paste subjects.txt GCOR.txt &gt; covariates.txt
+Hay que editar para agregar los nombres de cada columna</p>
+<p>Script de 3dttest++</p>
+<dl>
+<dt>3dttest++ -prefix stat.covar.ttest                         </dt><dd><dl class="option-list">
+<dt><kbd><span class="option">-A<var>minusB</var></span></kbd></dt>
+<dd><p></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>-setA CN                                   </dt><dd><p>sub-021 “sub-021.rest.results/sub-021.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-022 “sub-022.rest.results/sub-022.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-028 “sub-028.rest.results/sub-028.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-029 “sub-029.rest.results/sub-029.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-031 “sub-031.rest.results/sub-031.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-032 “sub-032.rest.results/sub-032.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-033 “sub-033.rest.results/sub-033.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-036 “sub-036.rest.results/sub-036.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-038 “sub-038.rest.results/sub-038.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    </p>
+</dd>
+<dt>-setB SU                                   </dt><dd><p>sub-023 “sub-023.rest.results/sub-023.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-024 “sub-024.rest.results/sub-024.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-025 “sub-025.rest.results/sub-025.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-026 “sub-026.rest.results/sub-026.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-027 “sub-027.rest.results/sub-027.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-030 “sub-030.rest.results/sub-030.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-034 “sub-034.rest.results/sub-034.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-035 “sub-035.rest.results/sub-035.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    sub-091 “sub-091.rest.results/sub-091.CORR-PCC_000_INDIV/WB_Z_ROI_001+tlrc.HEAD”    -covariates covariates.txt</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>bash ttest_3</p>
+<p>Pages 45
+Home
+For Newbies
+Lab Manual and Code of Conduct
+Lab Data Organization
+SUDMEX_CONN
+Bruker
+Acquire rsfMRI Bruker 7T
+Acquire T2w in vivo Bruker
+Average T1w or T2w repetitions Bruker 7T
+Bruker ClinScan 7T Tips
+Convert DICOM from Bruker
+Download DICOM from Bruker 7T
+MINC
+Create image from data for QC
+Display &amp; Register
+AFNI
+AFNI Arreglar scripts
+AFNI Preprocesamiento y QC en Resting State
+AFNI QC Rápido
+fMRIprep
+fMRIprep preprocessing
+DeepLabCut
+Lab Methods
+Blood Alcohol Concentration (BAC)
+Conditioned Place Preference (CPP)
+Elevated Plus Maze (EPM)
+Outline IA2BC
+Intermittent Access Two Bottle Choice (IA2BC)
+Fixed Brains for MRI
+Novel Object Recognition (NOR)
+Aproximaciones sucesivas con morfina
+Surgical implantation of Chronic Neural Carbon Fiber Electrodes
+DBM
+Deformation Based Morphometry MBM.py no atlas
+Deformation Based Morphometry MBM.py with atlas
+Two Level DBM model in rodents and humans
+Axolotl
+Create Template brain
+FSL
+Topup
+MRIQC
+MRIQC for BIDS
+MRIQC Humans
+Preprocessing rats
+Functional in vivo
+Structural in vivo
+Preprocessing extras
+Defacing 3D anatomical data
+Gibbs Rings
+BIDS
+Dicom to BIDS
+Niagara
+First steps on Niagara
+TIPS
+Visualization Resources
+Change Extension in Loops
+Useful Bash Commands
+Loops
+Qbatch
+Trackvis and Diffusion
+XCPEngine
+Clone this wiki locally
+<a class="reference external" href="https://github.com/neuropsytox/Documentation.wiki.git">https://github.com/neuropsytox/Documentation.wiki.git</a>
+Footer</p>
 </section>
 
 
@@ -67,10 +474,20 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">AFNI Preprocesamiento, QC y Análisis Seed‐based en Resting State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="N4BiasFieldCorrection.html">N4BiasFieldCorrection</a></li>
 </ul>
 
 <div class="relations">
@@ -78,19 +495,10 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to Numerical_Analysis_2E_Walter’s documentation!</a></li>
+      <li>Next: <a href="N4BiasFieldCorrection.html" title="next chapter">N4BiasFieldCorrection</a></li>
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -107,8 +515,8 @@
       &#169;2025, leopoldo.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/AFNI_Preprocesamiento.rst.txt"
