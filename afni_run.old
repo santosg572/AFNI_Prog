@@ -1,0 +1,9 @@
+#!/bin/bash
+
+docker run --rm -ti                  \
+    --user=`id -u`                   \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e DISPLAY=${DISPLAY}            \
+    -v ${HOME}:/opt/home             \
+    afni/afni_make_build
+
