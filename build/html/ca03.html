@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 3: Registration and Normalization &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chapter-3-registration-and-normalization">
+<h1>Chapter 3: Registration and Normalization<a class="headerlink" href="#chapter-3-registration-and-normalization" title="Link to this heading">¶</a></h1>
+<p><strong>Overview</strong></p>
+<p>Although most people’s brains are similar - everyone has a cingulate gyrus and a corpus callosum, for instance - there are also differences in brain size and shape. As a consequence, if we want to do a group analysis we need to ensure that each voxel for each subject corresponds to the same part of the brain. If we are measuring a voxel in the visual cortex, for example, we would want to make sure that every subject’s visual cortex is in alignment with each other.</p>
+<p>This is done by Registering and Normalizing the images. Just as you would fold clothes to fit them inside of a suitcase, each brain needs to be transformed to have the same size, shape, and dimensions. We do this by normalizing (or warping) to a template. A template is a brain that has standard dimensions and coordinates - standard, because most researchers have agreed to use them when reporting their results. That way, if you normalize your data to that template and find an effect at coordinates X=3, Y=20, Z=42, someone else who has warped their data to the same template can check their results against yours. The dimensions and coordinates of the template brain are also referred to as standardized space.</p>
+<p>../../../_images/04_03_MNI_Template.png</p>
+<p>An example of a commonly used template, the MNI152 brain. This is an average of 152 healthy adult brains, which represent the population that most studies draw from. If you are studying another population - such as children or the elderly, for example - consider using a template created from representatives of that population. (Question: Why is the template blurry?)</p>
+<p><strong>Affine Transformations</strong></p>
+<p>To warp the images to a template, we will use an affine transformation. This is similar to the rigid-body transformation described above in Motion Correction, but it adds two more transformations: zooms and shears. Whereas translations and rotations are easy enough to do with an everyday object such as a pen, zooms and shears are more unusual - zooms either shrink or enlarge the image, while shears take the diagonally opposite corners of the image and stretch them away from each other. The animation below summarizes these four types of linear transformations.</p>
+<p>../../../_images/04_03_AffineTransformations.gif</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As with rigid-body transformations, zooms and shears each have three degrees of freedom: You can zoom or shear an image along the x-, y-, or z-axis. In total, then, affine transformations have twelve degrees of freedom. These are also called linear transformations because a transformation applied in one direction along an axis is accompanied by a transformation of equal magnitude in the opposite direction. A translation of one millimeter to the left, for example, implies that the image has been moved one millimeter from the right. Likewise, if an image is enlarged by one millimeter along the z-axis, it is enlarged by one millimeter in both directions along that axis. Transformations without these constraints are called nonlinear transformations. For example, a nonlinear transformation can enlarge the image in one direction while shrinking it in the other direction, as when squeezing a sponge. These types of transformations will be discussed later.</p>
+</div>
+<p><strong>Registration and Normalization</strong></p>
+<p>Recall that we have both anatomical and functional images in our dataset. Our goal is to warp the functional images to the template so that we can do a group-level analysis across all of our subjects. Although it may seem reasonable to simply warp the functional images directly to the template, in practice that doesn’t work very well - the images are low-resolution, and therefore less likely to match up with the anatomical details of the template. The anatomical image is a better candidate.</p>
+<p>Although this may not seem to help us towards our goal, in fact warping the anatomical image can assist with bringing the functional images into standardized space. Remember that the anatomical and functional scans are typically acquired in the same session, and that the subject’s head moves little, if at all, between the scans. If we have already normalized our anatomical image to a template and recorded what transformations were done, we can apply the same transformations to the functional images - provided they start in the same place as the anatomical image.</p>
+<p>This alignment between the functional and anatomical images is called Registration. Most registration algorithms use the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Assume that the functional and anatomical images are in roughly the same location. If they are not, align the outlines of the images.</p></li>
+<li><p>Take advantage of the fact that the anatomical and functional images have different contrast weightings - that is, areas where the image is dark on the anatomical image (such as cerebrospinal fluid) will appear bright on the functional image, and vice versa. This is called mutual information. The registration algorithm moves the images around to test different overlays of the anatomical and functional images, matching the bright voxels on one image with the dark voxels of another image, and the dark with the bright, until it finds a match that cannot be improved upon. (AFNI’s preferred approach is a method called LPC, or Local Pearson Correlation, which gives greater weight to those regions of the functional image that are brighter: see this paper for more details.)</p></li>
+<li><p>Once the best match has been found, then the same transformations that were used to warp the anatomical image to the template are applied to the functional images.</p></li>
+</ol>
+</div></blockquote>
+<p>../../../_images/04_03_Registration_Normalization_Demo.gif</p>
+<p><strong>Registration with AFNI’s align_epi_anat.py</strong></p>
+<p>The command align_epi_anat.py can do several preprocessing steps at once - registration, aligning the volumes of the functional images together, and slice-timing correction. In this example, however, we will just use it for registration. The code for this step will be found in lines 110-115 of your proc script:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>align_epi_anat.py<span class="w"> </span>-anat2epi<span class="w"> </span>-anat<span class="w"> </span>sub-08_T1w+orig<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-save_skullstrip<span class="w"> </span>-suffix<span class="w"> </span>_al_junk<span class="w">          </span><span class="se">\</span>
+<span class="w">  </span>-epi<span class="w"> </span>vr_base_min_outlier+orig<span class="w"> </span>-epi_base<span class="w"> </span><span class="m">0</span><span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-epi_strip<span class="w"> </span>3dAutomask<span class="w">                      </span><span class="se">\</span>
+<span class="w">  </span>-giant_move<span class="w">                                </span><span class="se">\</span>
+<span class="w">  </span>-volreg<span class="w"> </span>off<span class="w"> </span>-tshift<span class="w"> </span>off
+</pre></div>
+</div>
+<p>The first option, -anat2epi, indicates that the anatomical image will be aligned to the functional images - not vice versa. As a general rule, we want to introduce as few changes and interpolations to our functional data as possible. Therefore, if an image has to be moved and slightly deformed, we choose to do it to the anatomical image.</p>
+<p>The -suffix command appends the string “_al_junk” to some of the intermediate stages of the registration, which we will use later for normalizing the functional images. The “epi” options (i.e., -epi, -epi_base, and -epi_strip) signalize that the functional volume with the least variability will be used as a reference image, and that non-brain tissue should be stripped using 3dAutomask, an alternative to 3dSkullStrip. -giant_move attempts to find a good initial starting alignment between the anatomical and functional images; and the last two options indicate that we do not want to include alignment and slice-timing correction in the current command.</p>
+<p><strong>Normalization with AFNI’s &#64;auto_tlrc</strong></p>
+<p>Once we have aligned the anatomical and functional images, we will first normalize the anatomical image to a template. These warps, as you will see in the next chapter, will be applied to the functional images as well. To normalize the anatomical image, we will use the &#64;auto_tlrc command; this and a following command, cat_matvec, are found in lines 118-122 of your proc script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># warp anatomy to standard space</span>
+@auto_tlrc<span class="w"> </span>-base<span class="w"> </span>MNI_avg152T1+tlrc<span class="w"> </span>-input<span class="w"> </span>sub-08_T1w_ns+orig<span class="w"> </span>-no_ss
+
+<span class="c1"># store forward transformation matrix in a text file</span>
+cat_matvec<span class="w"> </span>sub-08_T1w_ns+tlrc::WARP_DATA<span class="w"> </span>-I<span class="w"> </span>&gt;<span class="w"> </span>warp.anat.Xat.1D
+</pre></div>
+</div>
+<p>The first command indicates to use the image MNI_avg152T1 as a template, and the skull-stripped anatomical image as a source image, or the image to be moved around to best match the base, or reference, image. The -no_ss option indicates that the anatomical image has already been skull-stripped.</p>
+<p>In order to align the template and the anatomical image, the anatomical image needs to be moved and transformed using the transformations described above. This creates a series of numbers organized in an affine transformation matrix which is stored in the header of the anatomical image. The second command, cat_matvec, extracts this matrix and copies it into a file called warp.anat.Xat.1D. How this matrix is used to bring the functional images to the same normalized space will be seen in the next chapter.</p>
+<p><strong>Exercises</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>In the &#64;auto_tlrc command above, the default template is MNI_avg152+tlrc, which can be found in your ~/abin directory. Take a look at available templates in MNI space by typing ls ~/abin | grep MNI. Not all of these are candidates for normalizing T1 anatomical scans, but a couple of them are, including MNI152_1mm_uni+tlrc and MNI152_T1_2009c+tlrc. Once you have skull-stripped an anatomical image, try using this command:</p></li>
+</ol>
+</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span><span class="n">dcopy</span> <span class="n">sub</span><span class="o">-</span><span class="mi">01</span><span class="n">_T1w_ns</span><span class="o">+</span><span class="n">orig</span><span class="o">.</span> <span class="n">T1w_cop</span> <span class="nd">@auto_tlrc</span> <span class="o">-</span><span class="n">base</span> <span class="n">MNI152_T1_2009c</span><span class="o">+</span><span class="n">tlrc</span> <span class="o">-</span><span class="nb">input</span> <span class="n">T1w_copy</span><span class="o">+</span><span class="n">orig</span><span class="o">.</span> <span class="o">-</span><span class="n">no_ss</span>
+</pre></div>
+</div>
+<p>And observe how the output is different from the original command above. Try it also with the MNI152_T1_2009c+tlrc template, creating a new copy of the original T1-weighted anatomical image in orig space. Which template would you prefer to use? Why? Also, why do you think that the default is the MNI_avg152T1+tlrc brain? (Hint: Look at each of these templates in the AFNI viewer by typing afni ~/abin.)</p>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><p>As a follow-up exercise, what would you change about the command listed in Exercise #1 if you hadn’t skull-stripped the anatomical image?</p></li>
+</ol>
+</div></blockquote>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/ca03.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
