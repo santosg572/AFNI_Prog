@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 4: The General Linear Model &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chapter-4-the-general-linear-model">
+<h1>Chapter 4: The General Linear Model<a class="headerlink" href="#chapter-4-the-general-linear-model" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This chapter is a brief introduction to the General Linear Model (GLM), and how it is applied to</p>
+</div>
+<p>fMRI data. For a more complete introduction to the GLM, see this tutorial by StatSoft.</p>
+<p><strong>Introduction</strong></p>
+<p>We now come to the General Linear Model, or GLM. With a GLM, we can use one or more regressors, or
+independent variables, to fit a model to some outcome measure, or dependent variable. To do this we
+compute numbers called beta weights, which are the relative weights assigned to each regressor to
+best fit the data. Any discrepancies between the model and the data are called residuals.</p>
+<p>The symbols representing each of these terms are shown in the following equation, which can be
+shortened or expanded depending on the number of regressors in your model:</p>
+<p>../../../_images/05_04_GLM_Equation.png</p>
+<p>Let’s see how to apply this to a simple example. Imagine that we want to predict GPA based on
+height, IQ, and number of drinks per week. We may find that IQ has a positive association with GPA,
+number of drinks has a negative association, and height has no association at all; and we assign
+each of these regressors beta weights to best fit the data. For example, maybe each additional IQ
+point is associated with an additional 0.05 increase in GPA, while each additional drink per week
+is associated with a -0.07 decrease in GPA. In that case our model and its beta weights would look
+something like this (in which asterisks represent beta weights that are statistically significant,
+or are unlikely to be associated with the outome measure just by chance):</p>
+<p>../../../_images/05_04_GLM_Example.png</p>
+<p>This GLM can be expanded to include many regressors, but however many there are, the GLM assumes
+that the data can be modeled as a linear combination of each of the regressors - hence the name
+General Linear Model. We will see how to apply the GLM to fMRI data in the next chapter.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cb04.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

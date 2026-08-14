@@ -1,0 +1,41 @@
+AFNI Tutorial #9: Surface-Based Analysis with SUMA
+===================================================
+
+Our analyses so far have been volume-based - that is, we have preprocessed and calculated 
+statistics for each voxel of a three-dimensional cube. Our goal in this chapter is to do the 
+preprocessing and statistical modeling on a two-dimensional surface of the cortex. This gives you 
+several advantages, including:
+
+1. The ability to visualize activity along the surfaces of the gyri and sulci, which gives you a 
+better picture of where the activity is localized;
+
+2. This also avoids the partial voluming problem of a voxel that encompasses the edges of multiple 
+gyri, making it impossible to determine which part of the cortex the activity comes from;
+
+3. The ability to use larger smoothing kernels to increase your signal-to-noise ratio.
+
+We will run this analysis with SUMA, a package that comes with your AFNI installation. Technically, 
+SUMA is a separate package that can be run on its own, but we will be using it in conjunction with 
+the AFNI viewer and with AFNI commands.
+
+../../_images/09_SUMA.jpg
+
+SUMA! Photo taken from the AFNI website.
+
+Before going on, review the FreeSurfer tutorials to make sure you have FreeSurfer installed. You 
+will also want to install the command parallel to speed up your analysis.
+
+**Start-to-Finish fMRI Analysis with SUMA**
+
+SUMA Tutorial #1: Reconstructing the Cortical Surface
+
+SUMA Tutorial #2: @SUMA_Make_Spec_FS and @SUMA_AlignToExperiment
+
+SUMA Tutorial #3: Analysis on the Surface
+
+SUMA Tutorial #4: Group Analysis
+
+SUMA Tutorial #5: Region of Interest Analysis
+
+
+

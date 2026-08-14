@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 2: History of the BOLD Signal &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chapter-2-history-of-the-bold-signal">
+<h1>Chapter 2: History of the BOLD Signal<a class="headerlink" href="#chapter-2-history-of-the-bold-signal" title="Link to this heading">¶</a></h1>
+<p>Throughout the 1980’s and early 1990’s, neuroimaging researchers would measure the contrast between
+brain tissues using methods such as positron emission tomography, or PET. This involves injecting a
+radioactive glucose tracer that is absorbed by neurons when they fire. By taking images of the
+brain under different experimental conditions, such as seeing a flashing checkerboard or doing a
+cognitively demanding problem, researchers could see which regions were more active compared to
+other regions.</p>
+<p>However, this method is invasive, and the idea of being injected with a radioactive tracer deterred
+many people from being subjects in such experiments. By the early 1990’s, an alternative imaging
+technique called magnetic resonance imaging (MRI) had become much faster and less expensive, and
+researchers were looking for a way to make it more widespread for clinical use. In 1990, a
+researcher at Bell Laboratories named Seiji Ogawa discovered that more deoxygenated blood leads to
+a decrease in the signal measured from a brain region. An increase in oxygenated blood, on the
+other hand, increases the signal - and this increase in oxygenated blood was later shown to be
+correlated with increased neural firing. This change in signal is known as blood oxygen level
+dependent signal (or BOLD signal).</p>
+<p>Shortly afterwards, in 1992, a researcher at Massachusetts General Hospital named Ken Kwong
+demonstrated that the BOLD signal could be used as an indirect measure of neural activity. His
+experiment consisted of alternately showing a flashing checkerboard and a black screen to the
+subject for one minute each. The BOLD signal was recorded during each condition, as shown in the
+following video:</p>
+<p>../../../_images/05_02_Kwong_fMRI_Video.gif</p>
+<p>This experiment was an important one, becoming the template for many functional neuroimaging
+experiments. Kwong had found a way to use blood inside the body as an endogenous tracer for imaging
+brain activity in healthy subjects, eliminating the need for injections or radiation. As a result
+fMRI experiments became more popular, and by the early 2000’s fMRI had become the dominant
+neuroimaging method.</p>
+<p><strong>The BOLD Signal as an Indirect Measure of Neural Firing</strong></p>
+<p>Although the discoveries of Ogawa and Kwong were a boon for neuroimagers using MRI, there was a
+catch: This new method was an indirect measure of brain activity, a few steps removed from the
+actual neural firing. Whenever a stimulus is presented - such as a flash of light, or a sudden
+noise - that stimulus is transduced by the sensory organs into nerve impulses, which in turn
+stimulate neuronal firing in the brain. Neurons that fire require oxygen, and oxygen is delivered
+by the blood. That oxygenated blood in turn increases the signal from nearby hydrogen in the water
+in your body, which is what is measured in the scanner.</p>
+<p>Nevertheless, this is the measure used to infer whether a given region of the brain is “active” or
+not. And to make those inferences, we will need to take a closer look at the BOLD signal,
+experimental designs, and how we integrate the two with mathematical models.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cb02.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

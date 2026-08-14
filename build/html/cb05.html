@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 5: Creating Timing Files &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chapter-5-creating-timing-files">
+<h1>Chapter 5: Creating Timing Files<a class="headerlink" href="#chapter-5-creating-timing-files" title="Link to this heading">¶</a></h1>
+<p><strong>The Ideal Time-Series and the Fitted Time-Series</strong></p>
+<p>We just saw how we can use several regressors, or independent variables, to estimate an outcome
+measure such as GPA. Conceptually, we’re doing the same thing when we use several regressors to
+estimate brain activity, which is our outcome measure with fMRI data: We estimate the average
+amplitude of the BOLD signal in response to each condition in our model.</p>
+<p>In the animation below, the different colors of the BOLD responses represent different conditions
+(such as Congruent and Incongruent), and the gray line represents the timecourse of our
+preprocessed data. This shows how the amplitude of each condition is being estimated to best fit
+the data; for the condition on the left, it is relatively high, whereas for the condition on the
+right, it is relatively low. You can also imagine a condition’s BOLD signal which is not
+significantly different from zero, or which is even negative.</p>
+<p>../../../_images/05_05_GLM_fMRI_Data.gif</p>
+<p>The Red and Green lines representing the HRFs are called the ideal time-series. This is the
+time-series that we expect, given the timing of each stimulus in our experiment. When we estimate
+beta weights to fit this ideal time-series to the data, the result is called a fitted time-series,
+shown in the animation as a blue line.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since every voxel has its own time-series, we do the procedure above for every voxel in the</p>
+</div>
+<p>brain.
+This is known as a mass univariate analysis, since we estimate beta weights for each voxel’s
+time-series. As there are tens or hundreds of thousands of voxels in a typical fMRI dataset, later
+we will need to correct for all of the tests we have done. This will be covered in a later chapter
+on group analysis.</p>
+<p><strong>Creating the Ideal Time-Series</strong></p>
+<p>Our goal is to create the fitted time-series so that we can use the estimated beta weights in a
+group-level analysis. But to do that, we first need to create our ideal time-series.</p>
+<p>Let’s take a look at the Flanker dataset. Within each subject’s func directory are files labeled
+events.tsv. These files contain three pieces of information that we need to create our timing files
+(also known as onset files):</p>
+<ol class="arabic simple">
+<li><p>The name of the condition;</p></li>
+<li><p>When each trial of the condition occurred, in seconds, relative to the start of the scan; and</p></li>
+<li><p>The duration of each trial.</p></li>
+</ol>
+<p>These need to be extracted from the events.tsv files and formatted in a way that the AFNI software
+can read. In this case, we will create a timing file for each condition, and then split that file
+according to which run the condition was in. In total, then, we will create four timing files:</p>
+<p>1. Timings for the Incongruent trials that occurred during the first run (which we will call
+incongruent_run1.txt);</p>
+<ol class="arabic simple" start="2">
+<li><p>Timings for the Incongruent trials that occurred during the second run (incongruent_run2.txt);</p></li>
+<li><p>Timings for the Congruent trials that occurred during the first run (congruent_run1.txt);</p></li>
+<li><p>Timings for the Congruent trials that occurred during the second run (congruent_run2.txt).</p></li>
+</ol>
+<p>Each of these timing files will have the same format consisting of three columns, in the following
+order:</p>
+<ol class="arabic simple">
+<li><p>Onset time, in seconds, relative to the start of the scan;</p></li>
+<li><p>Duration of the trial, in seconds;</p></li>
+<li><p>Parametric modulation.</p></li>
+</ol>
+<p>The timing files for each run will be condensed into a single timing file for each condition, which
+will be called incongruent.1D and congruent.1D. The 1D extension is specific to AFNI; it indicates
+that the file contains text arranged in rows and columns.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We will discuss parametric modulation in a future module. For now, all you need to know is that</p>
+</div>
+<p>it
+is a required column, and unless you have parametrically modulated trials (which we do not have in
+this dataset), set it to a value of “1” for each trial.</p>
+<p>../../../_images/05_05_TimingFiles_Example.png</p>
+<p>The Run-1_events.tsv file on OpenNeuro.org (A). When we download it and look at it in the Terminal,
+it looks like the text in window (B). We then re-format the events file to create a timing file for
+each run with three columns: Onset time, duration, and parametric modulation (C), and use AFNI’s
+timing_tool.py to convert this to a timing format that AFNI understands (D).</p>
+<p>To format the timing files, download this script. (You can download it by clicking on the Raw
+button, then right-clicking in the newly-opened window and selecting “Save As”.) We won’t go into
+detail about how it works, but all you need to do is place it in the experimental folder containing
+the subjects, and type bash make_Timings.sh. This will create timing files for each run for each
+subject and store them in each subject’s corresponding func directory. To check the output, type
+cat sub-08/func/incongruent.1D. You should see numbers similar to the ones in the figure above.</p>
+<p>Once you have created the timing files, you are now ready to use them to fit a model to the fMRI
+data. To see how to do that, click the Next button.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cb05.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
