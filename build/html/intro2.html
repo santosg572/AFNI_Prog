@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Introduction to AFNI &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
-    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
-    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=877ede6b" />
-    <script src="../_static/documentation_options.js?v=f2a433a1"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="What is AFNI?" href="intro.html" />
    
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
 
   
@@ -35,19 +36,21 @@
   <section id="introduction-to-afni">
 <h1>Introduction to AFNI<a class="headerlink" href="#introduction-to-afni" title="Link to this heading">¶</a></h1>
 <p>This course will show you how to analyze an fMRI dataset from start to finish. We will begin by downloading a sample dataset and inspecting the anatomical and functional images for each subject. We will then preprocess the data, which removes noise and enhances the signal in the images. Once the images have been preprocessed, we will create a model representing what we think the BOLD signal, a measure of neural activity, should look like in our images. During model fitting we compare this model with the signal in different areas of the image. This model fit is a measure of the strength of the signal under different conditions - for example, we can take the difference of the signal between conditions A and B of the experiment to see which condition leads to a larger BOLD response.</p>
-<p>Once a model has been created for each subject and the BOLD response has been estimated for each condition, we can do any kind of group analysis we like: Paired t-tests, between-group t-tests, interactions, and so on. The goal of this course is to calculate a simple within-subjects contrast between two conditions, and test whether it is significant across subjects. You will also learn how to create figures showing whole-brain analyses, similar to what you see published in the neuroimaging journals, and how to do a region of interest (ROI) analysis.
-../../_images/Intro_Final_Map.png</p>
+<p>Once a model has been created for each subject and the BOLD response has been estimated for each condition, we can do any kind of group analysis we like: Paired t-tests, between-group t-tests, interactions, and so on. The goal of this course is to calculate a simple within-subjects contrast between two conditions, and test whether it is significant across subjects. You will also learn how to create figures showing whole-brain analyses, similar to what you see published in the neuroimaging journals, and how to do a region of interest (ROI) analysis.</p>
+<p>../../_images/Intro_Final_Map.png</p>
 <p>A figure showing group-level results from the data used in this course, represented as a z-statistic map. Brighter colors indicate larger z-scores. You will begin by preprocessing the raw data and end with creating a statistical map like this one.</p>
 <p>This course is designed to build your confidence in working with fMRI data, increase your fluency with the basic terms of fMRI analysis, and help you make educated choices during each step. Some chapters have exercises to help you practice what you’ve learned and to prepare you for the next chapter. Once you have mastered the fundamentals of this course, you will be able to apply them to other datasets of your choosing.</p>
 <p><strong>Downloading and Installing AFNI</strong></p>
 <p>Depending on your computer’s operating system, you have several different options for downloading and installing the AFNI package. The AFNI website has instructions on how to install the software on Windows, Macintosh, and different versions of Linux; a tutorial video on how to install AFNI on a Macintosh operating system can be found here.</p>
 <p>For Macintosh users, an installation app has been created that will streamline the process. Once you have downloaded it here, simply unpack the app and follow the instructions; I recommend keeping the default boxes checked.</p>
-<p>If you do not have any of the required packages, such as R or Homebrew, the entire installation can take 1-2 hours. When it has completed, open a Terminal, type afni, and then press return. You should see the graphical user interface open. Close it, and from the same terminal type uber_subject.py and press return. You should see this window, which indicates that any Python-based programs should run without errors.
-../../_images/Intro_AFNI_GUI.png</p>
+<p>If you do not have any of the required packages, such as R or Homebrew, the entire installation can take 1-2 hours. When it has completed, open a Terminal, type afni, and then press return. You should see the graphical user interface open. Close it, and from the same terminal type uber_subject.py and press return. You should see this window, which indicates that any Python-based programs should run without errors.</p>
+<p>../../_images/Intro_AFNI_GUI.png</p>
 <p>When you have successfully installed AFNI and typed afni from the command line, you should see something like this.</p>
-<p><strong>Note</strong></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>This course will not be covering MRI physics in depth. For a review of that topic, I recommend chapters 1-5 of the book Functional Magnetic Resonance Imaging, by Huettel, Song, &amp; McCarthy (3rd Edition). Also see Allen Elster’s excellent MRI Questions website for useful illustrations of MRI concepts.</p>
-<p><strong>Video</strong></p>
+</div>
+<p><strong>Video</strong></p>
 <p>For a brief video introduction to AFNI and a walkthrough of how to download it, click here.</p>
 </section>
 
@@ -58,7 +61,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">Numerical_Analysis_2E_Walter</a></h1>
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
 
 
 
@@ -70,7 +73,7 @@
 
 <search id="searchbox" style="display: none" role="search">
     <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
+    <form class="search" action="search.html" method="get">
       <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
       <input type="submit" value="Go" />
     </form>
@@ -78,20 +81,20 @@
 </search>
 <script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../AFNI_fMRI_Intro.html">Introduction to AFNI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../AFNI_01_DataDownload.html">AFNI Tutorial #1: Downloading the Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../AFNI_02_ExperimentalDesign.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../AFNI_03_LookingAtTheData.html">AFNI Tutorial #3: Looking at the Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../AFNI_04_Preprocessing.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../AFNI_Intermezzo_Uber_Subject.html">Intermezzo: Running the Uber Subject Script</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../02_AFNI_Slice_Timing_Correction.html">Chapter 2: Slice-Timing Correction</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="intro.html">What is AFNI?</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction to AFNI</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="intro.html">What is AFNI?</a><ul>
+      <li>Previous: <a href="intro.html" title="previous chapter">What is AFNI?</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
@@ -115,7 +118,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
-      <a href="../_sources/afni_andy/introB.rst.txt"
+      <a href="_sources/intro2.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
