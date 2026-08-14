@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 5: Smoothing &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Chapter 6: Masking and Scaling" href="ca06.html" />
+    <link rel="prev" title="Chapter 4: Alignment and Motion Correction" href="ca04.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chapter-5-smoothing">
+<h1>Chapter 5: Smoothing<a class="headerlink" href="#chapter-5-smoothing" title="Link to this heading">¶</a></h1>
+<p><strong>Why Smooth?</strong></p>
+<p>It is common to smooth the functional data, or replace the signal at each voxel with a weighted
+average of that voxel’s neighbors. This may seem strange at first - why would we want to make the
+images blurrier than they already are?</p>
+<p>It is true that smoothing does decrease the spatial resolution of your functional data, and we
+don’t want less resolution. But there are benefits to smoothing as well, and these benefits can
+outweigh the drawbacks. For example, we know that fMRI data contain a lot of noise, and that the
+noise is frequently greater than the signal. By averaging over nearby voxels we can cancel out the
+noise and enhance the signal.</p>
+<p>../../../_images/04_05_Smoothing_Demo.gif</p>
+<p>In this animation, two different smoothing kernels (4mm and 10mm) are applied to an fMRI scan.
+Notice that as we use larger smoothing kernels, the images become blurrier and the anatomical
+details become less distinct. Also note that, for the sake of simplicity, this animation uses a 2D
+slice of the brain to demonstrate this preprocessing step. In actual fMRI data, the kernel would be
+applied in all three dimensions.</p>
+<p>Smoothing is done with AFNI’s 3dmerge command, which you will find under the “blur” header of the
+proc_Flanker script (lines 216-221). Of all the preprocessing steps, this one uses the fewest lines
+of code:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># blur each volume of each run</span>
+foreach<span class="w"> </span>run<span class="w"> </span><span class="o">(</span><span class="w"> </span><span class="nv">$runs</span><span class="w"> </span><span class="o">)</span>
+<span class="w">  </span>3dmerge<span class="w"> </span>-1blur_fwhm<span class="w"> </span><span class="m">4</span>.0<span class="w"> </span>-doall<span class="w"> </span>-prefix<span class="w"> </span>pb03.<span class="nv">$subj</span>.r<span class="nv">$run</span>.blur<span class="w"> </span><span class="se">\</span>
+<span class="w">       </span>pb02.<span class="nv">$subj</span>.r<span class="nv">$run</span>.volreg+tlrc
+end
+</pre></div>
+</div>
+<p>The -1blur_fwhm option specifies the amount to smooth the image, in millimeters - in this case,
+4mm. -doall applies this smoothing kernel to each volume in the image, and the -prefix option, as
+always, specifies the name of the output dataset.</p>
+<p>The last preprocessing steps will take these smoothed images and then scale them to have a mean
+signal intensity of 100 - so that deviations from the mean can be measured in percent signal
+change. Any non-brain voxels will then be removed by a mask, and these images will be ready for
+statistical analysis. To see how these last two preprocessing steps are done in AFNI, click the
+Next button.</p>
+<p><strong>Exercises</strong></p>
+<p>1. Apply different smoothing kernels to the raw functional data by navigating to the directory
+sub-01/func, and typing 3dmerge -1blur_fwhm 4.0 -doall -prefix test_blur_4mm.nii
+sub-01_task-flanker_run-1_bold.nii.gz. Look at the output file in the AFNI GUI. Then, do the same
+with smoothing kernels of 8mm, 12mm, and 20mm, remembering to change the name of the output file
+each time you smooth. Once you are done, you can remove all of the smoothed images by typing rm
+test*.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="intro.html">What is AFNI?</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro2.html">Introduction to AFNI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c02.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c03.html">AFNI Tutorial #3: Looking at the Data</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="intro.html">What is AFNI?</a><ul>
+  <li><a href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a><ul>
+      <li>Previous: <a href="ca04.html" title="previous chapter">Chapter 4: Alignment and Motion Correction</a></li>
+      <li>Next: <a href="ca06.html" title="next chapter">Chapter 6: Masking and Scaling</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/ca05.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

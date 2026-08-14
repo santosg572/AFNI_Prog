@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 6: Masking and Scaling &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Chapter 7: Checking Preprocessing" href="ca07.html" />
+    <link rel="prev" title="Chapter 5: Smoothing" href="ca05.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chapter-6-masking-and-scaling">
+<h1>Chapter 6: Masking and Scaling<a class="headerlink" href="#chapter-6-masking-and-scaling" title="Link to this heading">¶</a></h1>
+<p><strong>What is a Mask?</strong></p>
+<p>As you saw in previous tutorials, a volume of fMRI data includes both the brain and the surrounding
+skull and neck - regions that we are not interested in analyzing with AFNI, even though they do
+contain voxels with time-series data just as the brain voxels do. And, although it may not be
+obvious at first glance, we have large numbers of voxels that comprise the air outside the head.</p>
+<p>To reduce the size of our datasets and consequently speed up our analyses, we can apply a mask to
+our data. A mask simply indicates which voxels are to be analyzed - any voxels within the mask
+retain their original values (or can be assigned a value of 1), whereas any voxels outside mask are
+assigned a value of zero. It is analogous to tracing an outline of a drawing with tracing paper,
+and then cutting along the lines and keeping whatever falls inside the lines, discarding the rest.
+Applied to fMRI data, anything outside the mask we assume to be noise or something of no interest.</p>
+<p>Masks are created with AFNI’s 3dAutomask command, which only requires arguments for input and
+output datasets (lines 223-260 of the proc_Flanker script):</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>foreach<span class="w"> </span>run<span class="w"> </span><span class="o">(</span><span class="w"> </span><span class="nv">$runs</span><span class="w"> </span><span class="o">)</span>
+<span class="w">  </span>3dAutomask<span class="w"> </span>-prefix<span class="w"> </span>rm.mask_r<span class="nv">$run</span><span class="w"> </span>pb03.<span class="nv">$subj</span>.r<span class="nv">$run</span>.blur+tlrc
+end
+</pre></div>
+</div>
+<p>The rest of the code within the “mask” block creates a union of masks that represents the extent of
+all of the individual fMRI datasets in the experiment. It then computes a mask for the anatomical
+dataset, and then takes the intersection of the fMRI and anatomical masks:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># create union of inputs, output type is byte</span>
+3dmask_tool<span class="w"> </span>-inputs<span class="w"> </span>rm.mask_r*+tlrc.HEAD<span class="w"> </span>-union<span class="w"> </span>-prefix<span class="w"> </span>full_mask.<span class="nv">$subj</span>
+
+<span class="c1"># ---- create subject anatomy mask, mask_anat.$subj+tlrc ----</span>
+<span class="c1">#      (resampled from tlrc anat)</span>
+3dresample<span class="w"> </span>-master<span class="w"> </span>full_mask.<span class="nv">$subj</span>+tlrc<span class="w"> </span>-input<span class="w"> </span><span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>_T1w_ns+tlrc<span class="w">     </span><span class="se">\</span>
+<span class="w">        </span>-prefix<span class="w"> </span>rm.resam.anat
+
+<span class="c1"># convert to binary anat mask; fill gaps and holes</span>
+3dmask_tool<span class="w"> </span>-dilate_input<span class="w"> </span><span class="m">5</span><span class="w"> </span>-5<span class="w"> </span>-fill_holes<span class="w"> </span>-input<span class="w"> </span>rm.resam.anat+tlrc<span class="w">  </span><span class="se">\</span>
+<span class="w">         </span>-prefix<span class="w"> </span>mask_anat.<span class="nv">$subj</span>
+
+<span class="c1"># compute tighter EPI mask by intersecting with anat mask</span>
+3dmask_tool<span class="w"> </span>-input<span class="w"> </span>full_mask.<span class="nv">$subj</span>+tlrc<span class="w"> </span>mask_anat.<span class="nv">$subj</span>+tlrc<span class="w">          </span><span class="se">\</span>
+<span class="w">         </span>-inter<span class="w"> </span>-prefix<span class="w"> </span>mask_epi_anat.<span class="nv">$subj</span>
+
+<span class="c1"># compute overlaps between anat and EPI masks</span>
+3dABoverlap<span class="w"> </span>-no_automask<span class="w"> </span>full_mask.<span class="nv">$subj</span>+tlrc<span class="w"> </span>mask_anat.<span class="nv">$subj</span>+tlrc<span class="w">    </span><span class="se">\</span>
+<span class="w">         </span><span class="p">|&amp;</span><span class="w"> </span>tee<span class="w"> </span>out.mask_ae_overlap.txt
+
+<span class="c1"># note Dice coefficient of masks, as well</span>
+3ddot<span class="w"> </span>-dodice<span class="w"> </span>full_mask.<span class="nv">$subj</span>+tlrc<span class="w"> </span>mask_anat.<span class="nv">$subj</span>+tlrc<span class="w">               </span><span class="se">\</span>
+<span class="w">   </span><span class="p">|&amp;</span><span class="w"> </span>tee<span class="w"> </span>out.mask_ae_dice.txt
+
+<span class="c1"># ---- create group anatomy mask, mask_group+tlrc ----</span>
+<span class="c1">#      (resampled from tlrc base anat, MNI_avg152T1+tlrc)</span>
+3dresample<span class="w"> </span>-master<span class="w"> </span>full_mask.<span class="nv">$subj</span>+tlrc<span class="w"> </span>-prefix<span class="w"> </span>./rm.resam.group<span class="w">      </span><span class="se">\</span>
+<span class="w">        </span>-input<span class="w"> </span>/Users/ajahn/abin/MNI_avg152T1+tlrc
+
+<span class="c1"># convert to binary group mask; fill gaps and holes</span>
+3dmask_tool<span class="w"> </span>-dilate_input<span class="w"> </span><span class="m">5</span><span class="w"> </span>-5<span class="w"> </span>-fill_holes<span class="w"> </span>-input<span class="w"> </span>rm.resam.group+tlrc<span class="w"> </span><span class="se">\</span>
+<span class="w">         </span>-prefix<span class="w"> </span>mask_group
+</pre></div>
+</div>
+<p>The output of this code, which you will examine in greater detail in the next chapter, is the
+creation of a mask which traces the outline of the signal detected by the image:</p>
+<p>../../../_images/04_06_Mask_Example.png</p>
+<p>Example of a masked image. The original image is on the left, while the mask is on the right. The
+mask consists of 1’s for that voxels it determines to be within the skull, and 0’s everywhere
+else.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>From the above image, you can see that there appears to be some parts of the orbitofrontal</p>
+</div>
+<p>cortex
+excluded by the mask. Since the signal is relatively low in these regions to begin with (due to a
+phenomenon known as the magnetic susceptibility artifact which leads to signal dropout), the mask
+assumes that this region does not contain any brain voxels. This can be remedied by using a
+technique called field map unwarping. It is beyond the scope of the current tutorial, but if you
+are interested, you can read about one such method here.</p>
+<p><strong>Scaling</strong></p>
+<p>One problem with fMRI data is that we collect data with units that are arbitrary, and of themselves
+meaningless. The intensity of the signal that we collect can vary from run to run, and from subject
+to subject. The only way to create a useful comparison within or between subjects is to take the
+contrast of the signal intensity between conditions, as represented by a beta weight (which will be
+discussed later in the chapter on statistics).</p>
+<p>In order to make the comparison of signal intensity meaningful between studies as well, AFNI scales
+the timeseries in each voxel individually to a mean of 100:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># scale each voxel time series to have a mean of 100</span>
+<span class="c1"># (be sure no negatives creep in)</span>
+<span class="c1"># (subject to a range of [0,200])</span>
+foreach<span class="w"> </span>run<span class="w"> </span><span class="o">(</span><span class="w"> </span><span class="nv">$runs</span><span class="w"> </span><span class="o">)</span>
+<span class="w"> </span>3dTstat<span class="w"> </span>-prefix<span class="w"> </span>rm.mean_r<span class="nv">$run</span><span class="w"> </span>pb03.<span class="nv">$subj</span>.r<span class="nv">$run</span>.blur+tlrc
+<span class="w"> </span>3dcalc<span class="w"> </span>-a<span class="w"> </span>pb03.<span class="nv">$subj</span>.r<span class="nv">$run</span>.blur+tlrc<span class="w"> </span>-b<span class="w"> </span>rm.mean_r<span class="nv">$run</span>+tlrc<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>-c<span class="w"> </span>mask_epi_extents+tlrc<span class="w">                            </span><span class="se">\</span>
+<span class="w">        </span>-expr<span class="w"> </span><span class="s1">&#39;c * min(200, a/b*100)*step(a)*step(b)&#39;</span><span class="w">       </span><span class="se">\</span>
+<span class="w">        </span>-prefix<span class="w"> </span>pb04.<span class="nv">$subj</span>.r<span class="nv">$run</span>.scale
+end
+</pre></div>
+</div>
+<p>These changes will be reflected in the time-series; the first image below represents the
+time-series before scaling, and the next image shows the time-series after scaling. Note that the
+values in the first image are relatively high - in the 800s - and that they are arbitrary; they
+could just as easily be around 500 or 900 in another subject. By scaling each subject’s data to the
+same mean, as in the second image, we can place each run of each subject’s data on the same scale.</p>
+<p>../../../_images/04_06_Scaling_Before.png</p>
+<p><strong>Before Scaling</strong></p>
+<p>../../../_images/04_06_Scaling_After.png</p>
+<p>After Scaling</p>
+<p>Now that we have completed our preprocessing steps, it is time to review each step and check the
+data quality. In the next chapter, we will walk through how this is done.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="intro.html">What is AFNI?</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro2.html">Introduction to AFNI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c02.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c03.html">AFNI Tutorial #3: Looking at the Data</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="intro.html">What is AFNI?</a><ul>
+  <li><a href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a><ul>
+      <li>Previous: <a href="ca05.html" title="previous chapter">Chapter 5: Smoothing</a></li>
+      <li>Next: <a href="ca07.html" title="next chapter">Chapter 7: Checking Preprocessing</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/ca06.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
