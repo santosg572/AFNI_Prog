@@ -8,11 +8,6 @@ https://andysbrainbook.readthedocs.io/en/latest/AFNI/AFNI_Overview.html#what-is-
    :caption: Contents:
 
    intro
-   intro2
-   c01
-   c02
-   c03
-   c04
 
 
 
