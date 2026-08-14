@@ -22,4 +22,11 @@ The following tutorials will show you how to analyze a sample dataset with AFNI.
    c03
    c04
    c05
-
+   c06
+   c07
+   c08
+   c09
+   apeA
+   apeB
+   apeC
+   apeD
