@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Intermezzo: Running the Uber Subject Script &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Chapter 1: AFNI Commands and uber_subject.py" href="ca01.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="intermezzo-running-the-uber-subject-script">
+<h1>Intermezzo: Running the Uber Subject Script<a class="headerlink" href="#intermezzo-running-the-uber-subject-script" title="Link to this heading">¶</a></h1>
+<p><strong>Setting up the Analysis</strong></p>
+<p>We are ready to run these preprocessing steps using the uber_subject.py graphical user interface. For now we will simply set up the script and run it; while it is running, you will read the following chapters which describe what each preprocessing step does. We will end by reviewing the output from each step and determining whether any steps need to be changed.</p>
+<p>To begin, open a Terminal, navigate to the sub-08 directory and type uber_subject.py &amp;.</p>
+<p>The ampersand symbol (”&amp;”) will execute the command that you specified in the background; that is, it will run the command while at the same time keep the Terminal available for typing further commands. If you execute a command without the ampersand symbol, you can push the currently running command to the background by clicking in the Terminal that executed the command, and typing ctrl+z. This will suspend the current command; to put it in the background (i.e., continue to run it while keeping the Terminal free), type bg in the Terminal and press Enter.</p>
+<p>In the subject ID field, type sub_08, and in the group ID field, type Flanker. Click on the box next to “Analysis Initialization” and remove the regress block. (We will include this later, when we run a general linear model for each subject.) Then click on the browse anat button in the “anatomical dataset” section, navigate to the anat directory, and select the file sub-08_T1w.nii.gz. Select the functional datasets by clicking the browse EPI button in the “EPI datasets” section, navigate to the func directory, and hold down shift and click to select the files sub-08_task-flanker_run-1_bold.nii.gz and sub-08_task-flanker_run-2_bold.nii.gz. The first half of the GUI should look as follows:</p>
+<p>../../../_images/Intermezzo_uber_subject_1.png</p>
+<p>We will skip over the “stimulus timing files” and “symbolic GLTs” sections, as we are not yet doing regression. The default values in the “expected options” field are fine as they are - No TRs will be removed, the volume with the least amount of variability will be used as the reference image for alignment, a smoothing kernel of 4mm will be applied to the data, and any volumes that have a combined movement of 0.3mm from TR to TR will be flagged in a censor file (which will be used later, during regression).</p>
+<p>Skip over the “extra regress options”, and check the boxes next to “extra align options” and “extra tlrc options”. The default cost function of lpc+ZZ is fine; however, I recommend checking the box next to align: use giant_move. In case the functional and anatomical images are far away from each other (which can happen sometimes, due to the unforeseen changes in the scanner acquisition), an option called -giant_move will be used with the align_epi_anat.py command in order to bring them into a closer initial alignment.</p>
+<p>Lastly, in the “extra tlrc options” field, choose the template MNI_avg152T1+tlrc. This will use an MNI template, which are becoming more commonly used in fMRI analysis. When you have finished, the second half of the GUI should look like this:</p>
+<p>../../../_images/Intermezzo_uber_subject_2.png</p>
+<p><strong>Running the Analysis</strong></p>
+<p>When you are done setting up the analysis, you can execute it by clicking, from left to right, the three icons at the top of the GUI window. The first one looks like a sheet of paper with lines on it; this will generate the afni_proc.py command that includes everything that you specified in the GUI. Click on the icon, and it will return two windows: One listing each of the options that were changed from the defaults and listing each of the inputs, and another showing the code of the afni_proc.py command. Take a look at it to see how the commands and options listed in the afni_proc.py command correspond to the options you entered into the uber_subject.py GUI:</p>
+<p>../../../_images/Intermezzo_Generate_Command.png</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You will see a warning message that says “** warning: no stim timing files given (resting state?)” Since we are only running the preprocessing, we can ignore the message and click OK.</p>
+</div>
+<p>When you have looked over the output windows, close them. Now click on the next icon, a magnifying glass over a sheet of paper. This will execute the afni_proc.py code listed in the previous window, and return any warnings or errors that you should be aware of. (We don’t have any in this case.) You will also see a couple of lines of code specifying how to run the output of this command, which is a file called proc.sub_08.</p>
+<p>Close the window, and go back to your Terminal. From the sub-08 directory, notice that there is a new directory structure that has been created. Within the next directory subject_results, you will see group.Flanker, and below that, subj.sub_08. Navigate to this directory by typing cd subject_results/group.Flanker/subj.sub_08. Within this directory, there are three files:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>cmd.ap.sub_08: This is the afni_proc.py file that was generated by uber_subject.py.</p></li>
+<li><p>output.cmd.ap.sub_08: This is the output of afni_proc.py that generates any warnings or errors you should be aware of.</p></li>
+<li><p>proc.sub_08: The raw AFNI commands that will perform the actual preprocessing, as compiled by the afni_proc.py command. Open this file in either vi or TextWrangler to examine the contents. It should look something like this:</p></li>
+</ol>
+</div></blockquote>
+<p>../../../_images/Intermezzo_proc_output.png</p>
+<p>We are now ready to run this script. You can either type the code that was listed in output.cmd.ap.sub_08, or you can simply press the Green icon button at the top of the uber_subject.py GUI. If you do the latter, you will see another window open up that shows each command being run, and its corresponding output:</p>
+<p>../../../_images/Intermezzo_proc_running.png</p>
+<p><strong>Next Steps</strong></p>
+<p>The preprocessing will take about five minutes, depending on the speed your machine. While it is running, review the preprocessing steps in the following chapters.</p>
+<p><strong>Video</strong></p>
+<p>A video demonstration of uber_subject.py can be found here.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="intro.html">What is AFNI?</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro2.html">Introduction to AFNI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c02.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c03.html">AFNI Tutorial #3: Looking at the Data</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="intro.html">What is AFNI?</a><ul>
+  <li><a href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a><ul>
+      <li>Previous: <a href="ca01.html" title="previous chapter">Chapter 1: AFNI Commands and uber_subject.py</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/Intermezzo.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

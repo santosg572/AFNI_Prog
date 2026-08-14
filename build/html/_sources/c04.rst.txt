@@ -32,6 +32,7 @@ To begin preprocessing sub-08’s data, read through the following chapters. We 
    :caption: Contents:
 
    ca01
+   Intermezzo
 
 
 
