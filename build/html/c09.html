@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Welcome to Numerical_Analysis_2E_Walter’s documentation! &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <title>AFNI Tutorial #9: Surface-Based Analysis with SUMA &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
@@ -14,7 +14,6 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="What is AFNI?" href="intro.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,24 +31,32 @@
 
           <div class="body" role="main">
             
-  <section id="welcome-to-numerical-analysis-2e-walter-s-documentation">
-<h1>Welcome to Numerical_Analysis_2E_Walter’s documentation!<a class="headerlink" href="#welcome-to-numerical-analysis-2e-walter-s-documentation" title="Link to this heading">¶</a></h1>
-<p><a class="reference external" href="https://andysbrainbook.readthedocs.io/en/latest/AFNI/AFNI_Overview.html#what-is-afni">https://andysbrainbook.readthedocs.io/en/latest/AFNI/AFNI_Overview.html#what-is-afni</a></p>
-<blockquote>
-<div><div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro2.html">Introduction to AFNI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="c02.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="c03.html">AFNI Tutorial #3: Looking at the Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="c04.html">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="c05.html">AFNI Tutorial #5: Statistics and Modeling</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div></blockquote>
+  <section id="afni-tutorial-9-surface-based-analysis-with-suma">
+<h1>AFNI Tutorial #9: Surface-Based Analysis with SUMA<a class="headerlink" href="#afni-tutorial-9-surface-based-analysis-with-suma" title="Link to this heading">¶</a></h1>
+<p>Our analyses so far have been volume-based - that is, we have preprocessed and calculated
+statistics for each voxel of a three-dimensional cube. Our goal in this chapter is to do the
+preprocessing and statistical modeling on a two-dimensional surface of the cortex. This gives you
+several advantages, including:</p>
+<p>1. The ability to visualize activity along the surfaces of the gyri and sulci, which gives you a
+better picture of where the activity is localized;</p>
+<p>2. This also avoids the partial voluming problem of a voxel that encompasses the edges of multiple
+gyri, making it impossible to determine which part of the cortex the activity comes from;</p>
+<ol class="arabic simple" start="3">
+<li><p>The ability to use larger smoothing kernels to increase your signal-to-noise ratio.</p></li>
+</ol>
+<p>We will run this analysis with SUMA, a package that comes with your AFNI installation. Technically,
+SUMA is a separate package that can be run on its own, but we will be using it in conjunction with
+the AFNI viewer and with AFNI commands.</p>
+<p>../../_images/09_SUMA.jpg</p>
+<p>SUMA! Photo taken from the AFNI website.</p>
+<p>Before going on, review the FreeSurfer tutorials to make sure you have FreeSurfer installed. You
+will also want to install the command parallel to speed up your analysis.</p>
+<p><strong>Start-to-Finish fMRI Analysis with SUMA</strong></p>
+<p>SUMA Tutorial #1: Reconstructing the Cortical Surface</p>
+<p>SUMA Tutorial #2: &#64;SUMA_Make_Spec_FS and &#64;SUMA_AlignToExperiment</p>
+<p>SUMA Tutorial #3: Analysis on the Surface</p>
+<p>SUMA Tutorial #4: Group Analysis</p>
+<p>SUMA Tutorial #5: Region of Interest Analysis</p>
 </section>
 
 
@@ -59,7 +66,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">Numerical_Analysis_2E_Walter</a></h1>
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
 
 
 
@@ -77,8 +84,7 @@
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="intro.html" title="next chapter">What is AFNI?</a></li>
+  <li><a href="index.html">Documentation overview</a><ul>
   </ul></li>
 </ul>
 </div>
@@ -112,7 +118,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="_sources/index.rst.txt"
+      <a href="_sources/c09.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

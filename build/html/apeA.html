@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Appendix A: Parametric Modulation in AFNI &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="appendix-a-parametric-modulation-in-afni">
+<h1>Appendix A: Parametric Modulation in AFNI<a class="headerlink" href="#appendix-a-parametric-modulation-in-afni" title="Link to this heading">¶</a></h1>
+<p><strong>Overview</strong></p>
+<p>This tutorial will show you how to set up a parametric modulation analysis in AFNI. A review of
+parametric modulation, as well as the dataset we will be analyzing, can be found here. This
+tutorial will focus on preprocessing the data and using the parametric modulators in the general
+linear model.</p>
+<p><strong>Preprocessing the Data</strong></p>
+<p><strong>Creating the Timing Files</strong></p>
+<p>We will first create timing files that contain onsets for the Gamble, the parametric value for the
+potential Gain, and the parametric value for the potential Loss, for each run; in total, we will
+create nine regressors.</p>
+<p>You can download a script to convert the timings into a format that AFNI understands by clicking
+here, clicking on the Raw button, and right-clicking anywhere on the screen and selecting Save As.
+Save the file as a shell script into the Gambles directory. Once it has been downloaded, navigate
+to that directory with a Terminal and run the script by typing bash make_Gamble_Timings.sh. Within
+each func directory you should now see a file called gamble_Timings.1D, which looks like the
+following:</p>
+<p>../../_images/AppendixA_OnsetTimes.png</p>
+<p>The first number is the onset of the gamble; the asterisk indicates that the numbers coming after
+it are the modulators, separated by a comma. We will use this in the model for each subject.</p>
+<p><strong>Creating the Preprocessing Script</strong></p>
+<p>Similar to the scripting section of the AFNI tutorial, we will create a Batch script that can be
+used in a for-loop to analyze all of our subjects. Instead of using the uber_subject.py GUI,
+however, we will use the command afni_proc.py. The script can be downloaded here; click on Raw,
+right-click and choose Save As, and download it to your Gambles directory. If we open the file,
+this is what is inside:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/tcsh</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">subj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$argv</span><span class="o">[</span><span class="m">1</span><span class="o">]</span>
+
+<span class="w"> </span>afni_proc.py<span class="w"> </span>-subj_id<span class="w"> </span><span class="si">${</span><span class="nv">subj</span><span class="si">}</span><span class="w"> </span>-script<span class="w"> </span>proc.<span class="si">${</span><span class="nv">subj</span><span class="si">}</span><span class="w"> </span>-scr_overwrite<span class="w"> </span>-blocks<span class="w"> </span>tshift
+<span class="se">\</span>
+align<span class="w"> </span>tlrc<span class="w"> </span>volreg<span class="w"> </span>blur<span class="w"> </span>mask<span class="w"> </span>scale<span class="w"> </span>regress<span class="w"> </span>-copy_anat
+<span class="se">\</span>
+<span class="nv">$PWD</span>/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>/anat/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>_T1w.nii.gz<span class="w">                     </span><span class="se">\</span>
+-dsets
+<span class="se">\</span>
+<span class="nv">$PWD</span>/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>/func/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>_task-mixedgamblestask_run-01_bold.nii.gz<span class="w"> </span><span class="se">\</span>
+<span class="nv">$PWD</span>/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>/func/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>_task-mixedgamblestask_run-02_bold.nii.gz<span class="w"> </span><span class="se">\</span>
+<span class="nv">$PWD</span>/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>/func/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>_task-mixedgamblestask_run-03_bold.nii.gz<span class="w"> </span><span class="se">\</span>
+-tcat_remove_first_trs<span class="w"> </span><span class="m">0</span><span class="w"> </span>-align_opts_aea<span class="w"> </span>-giant_move<span class="w"> </span>-tlrc_base
+<span class="se">\</span>
+MNI_avg152T1+tlrc<span class="w"> </span>-volreg_align_to<span class="w"> </span>MIN_OUTLIER<span class="w"> </span>-volreg_align_e2a
+<span class="se">\</span>
+-volreg_tlrc_warp<span class="w"> </span>-blur_size<span class="w"> </span><span class="m">4</span>.0<span class="w"> </span>-regress_stim_times
+<span class="se">\</span>
+<span class="nv">$PWD</span>/<span class="o">{</span><span class="nv">$subj</span><span class="o">}</span>/func/gamble_Timings.1D<span class="w">                          </span><span class="se">\</span>
+-regress_stim_labels<span class="w"> </span>Gamble<span class="w"> </span>-regress_stim_types<span class="w"> </span>AM2<span class="w"> </span>-regress_basis<span class="w"> </span><span class="s1">&#39;BLOCK(3,1)&#39;</span><span class="w">     </span><span class="se">\</span>
+-regress_censor_motion<span class="w"> </span><span class="m">0</span>.3<span class="w"> </span>-regress_motion_per_run<span class="w"> </span>-regress_opts_3dD
+<span class="se">\</span>
+-jobs<span class="w"> </span><span class="m">8</span><span class="w"> </span>-regress_make_ideal_sum<span class="w"> </span>sum_ideal.1D<span class="w">                                                  </span><span class="se">\</span>
+-regress_run_clustsim<span class="w"> </span>no
+
+tcsh<span class="w"> </span>proc.<span class="si">${</span><span class="nv">subj</span><span class="si">}</span>
+</pre></div>
+</div>
+<p>The first line uses the first argument, or input, as the subject number for the rest of the script.
+The blocks tshift, align, tlrc, and so on, indicate the standard preprocessing steps of
+slice-timing correction, realignment, normalization, etc. The major difference from analyzing a
+non-parametric modulation dataset is using AM2, which stands for Amplitude Modulation. This will
+orthogonalize the modulators with respect to the main regressor, but not with respect to each
+other; for more details on why this is important, see the link to the Mumford et al. paper down
+below.</p>
+<p><strong>Running the Analysis</strong></p>
+<p>Now that we have a template preprocessing script, we can use it in a for-loop to analyze all of the
+subjects. Type the following:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="sb">`</span>cat<span class="w"> </span>subjList.txt<span class="sb">`</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span>tcsh<span class="w"> </span>runAFNIProc.sh<span class="w"> </span><span class="nv">$i</span><span class="p">;</span>
+<span class="k">done</span>
+</pre></div>
+</div>
+<p>This will take a couple of hours. We will return when it has finished preprocessing.</p>
+<p><strong>Group-Level Analysis</strong></p>
+<p>If you navigate into one of the output directories, such as sub-01.results, and open AFNI, load the
+warped anatomical image as an underlay and the stats.sub-01.+tlrc image as an overlay:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>afni<span class="w"> </span>anat_final.sub-01+tlrc.<span class="w"> </span>stats.sub-01+tlrc.
+</pre></div>
+</div>
+<p>In the Define Overlay window, there are multiple options in the OLay and Thr dropdown menus. The
+first one (Gamble#0_Coef) is the beta weight for the main regressor of “Gamble”, while sub-brik 3
+of Gamble#1_Coef corresponds to the parametric modulator of Gain and sub-brik 5 of Gamble#2_Coef
+corresponds to the parametric modulator of Loss. We will use these last two regressors as inputs
+into our group-level analysis.</p>
+<p>../../_images/AppendixA_GambleOverlays.png</p>
+<p>Our script will look like this:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/tcsh -xef</span>
+
+<span class="c1"># created by uber_ttest.py: version 2.0 (December 28, 2017)</span>
+<span class="c1"># creation date: Wed Feb 19 11:33:21 2020</span>
+
+<span class="c1"># ---------------------- set process variables ----------------------</span>
+
+<span class="nb">set</span><span class="w"> </span><span class="nv">mask_dset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$PWD</span>/sub-01.results/mask_group+tlrc
+
+<span class="nb">set</span><span class="w"> </span><span class="nv">dirA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$PWD</span>
+
+<span class="c1"># specify and possibly create results directory</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">results_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>test.results
+<span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="w"> </span>!<span class="w"> </span>-d<span class="w"> </span><span class="nv">$results_dir</span><span class="w"> </span><span class="o">)</span><span class="w"> </span>mkdir<span class="w"> </span><span class="nv">$results_dir</span>
+
+<span class="c1"># ------------------------- process the data -------------------------</span>
+
+3dttest++<span class="w"> </span>-prefix<span class="w"> </span><span class="nv">$results_dir</span>/GainPM<span class="w">                     </span><span class="se">\</span>
+<span class="w">     </span>-mask<span class="w"> </span><span class="nv">$mask_dset</span><span class="w">                                         </span><span class="se">\</span>
+<span class="w">     </span>-setA<span class="w"> </span>GainPM<span class="w">                                           </span><span class="se">\</span>
+<span class="w">        </span><span class="m">01</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-01.results/stats.sub-01+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">02</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-02.results/stats.sub-02+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">03</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-03.results/stats.sub-03+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">04</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-04.results/stats.sub-04+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">05</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-05.results/stats.sub-05+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">06</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-06.results/stats.sub-06+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">07</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-07.results/stats.sub-07+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">08</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-08.results/stats.sub-08+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">09</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-09.results/stats.sub-09+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">10</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-10.results/stats.sub-10+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">11</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-11.results/stats.sub-11+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">12</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-12.results/stats.sub-12+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">13</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-13.results/stats.sub-13+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">14</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-14.results/stats.sub-14+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">15</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-15.results/stats.sub-15+tlrc[3]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">16</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-16.results/stats.sub-16+tlrc[3]&quot;</span>
+</pre></div>
+</div>
+<p>Copy and paste this into your terminal, or download it here. It will create a new directory called
+GainPM, which you can overlay on a template brain and threshold at whatever level you want. At a
+relatively liberal voxel-wise uncorrected threshold of p=0.01, you can see that the gain modulators
+load significantly on the caudate nucleus. If we do the same analysis for the Loss modulators,
+which is sub-brik 5, you will see negative loadings in the same region. Compare this to the Tom et
+al. paper; do the results look similar? We could strengthen our results by changing the
+preprocessing or the GLM - for example, by increasing the smoothing kernel, or by using REML model
+estimation. This is left as an exercise for you to do on your own.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Because we have only 16 subjects, we won’t be able to use AFNI’s ETAC option, which is similar</p>
+</div>
+<p>to
+FSL’s threshold-free cluster enhancement. If you did have more subjects, however, you could try
+using this option as well.</p>
+<p><strong>Video</strong></p>
+<p>For a demonstration of what parametric analysis in AFNI looks like, click here.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/apeA.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

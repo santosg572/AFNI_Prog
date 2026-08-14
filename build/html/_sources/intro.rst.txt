@@ -21,4 +21,5 @@ The following tutorials will show you how to analyze a sample dataset with AFNI.
    c02   
    c03
    c04
+   c05
 

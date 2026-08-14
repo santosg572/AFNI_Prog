@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SUMA Tutorial #5: Region of Interest Analysis &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="suma-tutorial-5-region-of-interest-analysis">
+<h1>SUMA Tutorial #5: Region of Interest Analysis<a class="headerlink" href="#suma-tutorial-5-region-of-interest-analysis" title="Link to this heading">¶</a></h1>
+<p>Just as with our volumetric analyses, we can extract data from a region of interest (ROI)
+containing only those vertices that we are interested in.</p>
+<p><strong>Converting Volumetric Data to the Surface</strong></p>
+<p>The SUMA viewer includes a tool for drawing ROIs on the surface; these can then we saved into
+.niml.dset files, and used with an ROI tool such as 3dmaskdump or 3dROIstats. Instead of doing
+that, however, let’s assume that we want to use the same ROI as with our volumetric data - the
+midACC ROI created using the atlas, and the ConflictROI sphere created from the coordinates of
+another study.</p>
+<p>The command 3dVol2Surf can be used to convert a volumetric dataset to a surface dataset:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>3dVol2Surf<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_lh.spec<span class="w"> </span>-sv<span class="w"> </span>midACC+tlrc.<span class="w"> </span>-surf_A<span class="w"> </span>lh.pial
+-grid_parent
+midACC+tlrc.<span class="w"> </span>-map_func<span class="w"> </span>mask<span class="w"> </span>-out_niml<span class="w"> </span>midACC_ROI_lh.niml.dset
+</pre></div>
+</div>
+<p>This command, run from the directory containing the subjects and the suma_MNI_N27 directory,
+resamples the midACC dataset to the surface. The -surf_A option indicates which surface to resample
+to - in this case, the pial surface - and -map_func specifies that the output dataset should be a
+mask, i.e., 1’s inside the mask and 0’s everywhere else. As with the other surface commands, you
+should do this same procedure with the right hemisphere, if the mask bridges both hemispheres:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>3dVol2Surf<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_rh.spec<span class="w"> </span>-sv<span class="w"> </span>midACC+tlrc.<span class="w"> </span>-surf_A<span class="w"> </span>rh.pial
+-grid_parent
+midACC+tlrc.<span class="w"> </span>-map_func<span class="w"> </span>mask<span class="w"> </span>-out_niml<span class="w"> </span>midACC_ROI_rh.niml.dset
+</pre></div>
+</div>
+<p>We can do the same thing for the Conflict ROI, e.g.:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>3dVol2Surf<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_lh.spec<span class="w"> </span>-sv<span class="w"> </span>ConflictROI+tlrc.<span class="w"> </span>-surf_A<span class="w"> </span>lh.pial
+-grid_parent<span class="w"> </span>ConflictROI+tlrc.<span class="w"> </span>-map_func<span class="w"> </span>mask<span class="w"> </span>-out_niml<span class="w"> </span>ConflictROI_lh.niml.dset
+
+3dVol2Surf<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_rh.spec<span class="w"> </span>-sv<span class="w"> </span>ConflictROI+tlrc.<span class="w"> </span>-surf_A<span class="w"> </span>rh.pial
+-grid_parent<span class="w"> </span>ConflictROI+tlrc.<span class="w"> </span>-map_func<span class="w"> </span>mask<span class="w"> </span>-out_niml<span class="w"> </span>ConflictROI_rh.niml.dset
+</pre></div>
+</div>
+<p>As before, make sure to view the ROI after you have resampled it to make sure it is where you think
+it should be:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>suma<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_lh.spec<span class="w"> </span>-sv<span class="w"> </span>suma_MNI_N27/MNI_N27_SurfVol.nii<span class="w"> </span>-input
+ConflictROI_lh.niml.dset
+
+suma<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_rh.spec<span class="w"> </span>-sv<span class="w"> </span>suma_MNI_N27/MNI_N27_SurfVol.nii<span class="w"> </span>-input
+ConflictROI_rh.niml.dset
+
+../../../_images/09_05_ConflictROI_SUMA.png
+</pre></div>
+</div>
+<p><strong>Extracting the Data</strong></p>
+<p>Lastly, we will need to extract the data. It is easiest to do this by concatenating all of the
+stats files together, and then using an ROI tool on them; however, unlike the volumetric data,
+3dbucket’s -aglueto option doesn’t work with surface data. In this case, we will need to use 3dTcat
+to combine the files:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="k">for</span><span class="w"> </span>hemi<span class="w"> </span><span class="k">in</span><span class="w"> </span>lh<span class="w"> </span>rh<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w"> </span>3dTcat<span class="w"> </span>-prefix<span class="w"> </span><span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>_Congruent_Betas.niml.dset
+<span class="w"> </span>sub-01/sub-01.results_SUMA/stats.sub-01.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-02/sub-02.results_SUMA/stats.sub-02.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-03/sub-03.results_SUMA/stats.sub-03.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-04/sub-04.results_SUMA/stats.sub-04.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-05/sub-05.results_SUMA/stats.sub-05.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-06/sub-06.results_SUMA/stats.sub-06.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-07/sub-07.results_SUMA/stats.sub-07.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-08/sub-08.results_SUMA/stats.sub-08.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-09/sub-09.results_SUMA/stats.sub-09.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-10/sub-10.results_SUMA/stats.sub-10.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-11/sub-11.results_SUMA/stats.sub-11.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-12/sub-12.results_SUMA/stats.sub-12.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-13/sub-13.results_SUMA/stats.sub-13.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-14/sub-14.results_SUMA/stats.sub-14.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-15/sub-15.results_SUMA/stats.sub-15.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-16/sub-16.results_SUMA/stats.sub-16.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-17/sub-17.results_SUMA/stats.sub-17.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-18/sub-18.results_SUMA/stats.sub-18.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-19/sub-19.results_SUMA/stats.sub-19.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-20/sub-20.results_SUMA/stats.sub-20.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-21/sub-21.results_SUMA/stats.sub-21.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-22/sub-22.results_SUMA/stats.sub-22.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-23/sub-23.results_SUMA/stats.sub-23.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-24/sub-24.results_SUMA/stats.sub-24.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-25/sub-25.results_SUMA/stats.sub-25.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-26/sub-26.results_SUMA/stats.sub-26.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[1]&#39;</span>
+
+<span class="w"> </span>3dTcat<span class="w"> </span>-prefix<span class="w"> </span><span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>_Incongruent_Betas.niml.dset
+<span class="w"> </span>sub-01/sub-01.results_SUMA/stats.sub-01.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-02/sub-02.results_SUMA/stats.sub-02.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-03/sub-03.results_SUMA/stats.sub-03.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-04/sub-04.results_SUMA/stats.sub-04.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-05/sub-05.results_SUMA/stats.sub-05.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-06/sub-06.results_SUMA/stats.sub-06.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-07/sub-07.results_SUMA/stats.sub-07.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-08/sub-08.results_SUMA/stats.sub-08.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-09/sub-09.results_SUMA/stats.sub-09.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-10/sub-10.results_SUMA/stats.sub-10.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-11/sub-11.results_SUMA/stats.sub-11.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-12/sub-12.results_SUMA/stats.sub-12.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-13/sub-13.results_SUMA/stats.sub-13.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-14/sub-14.results_SUMA/stats.sub-14.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-15/sub-15.results_SUMA/stats.sub-15.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-16/sub-16.results_SUMA/stats.sub-16.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-17/sub-17.results_SUMA/stats.sub-17.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-18/sub-18.results_SUMA/stats.sub-18.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-19/sub-19.results_SUMA/stats.sub-19.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-20/sub-20.results_SUMA/stats.sub-20.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-21/sub-21.results_SUMA/stats.sub-21.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-22/sub-22.results_SUMA/stats.sub-22.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-23/sub-23.results_SUMA/stats.sub-23.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-24/sub-24.results_SUMA/stats.sub-24.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-25/sub-25.results_SUMA/stats.sub-25.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span><span class="w"> </span><span class="se">\</span>
+sub-26/sub-26.results_SUMA/stats.sub-26.<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="s1">&#39;[4]&#39;</span>
+<span class="w"> </span><span class="k">done</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To find the sub-briks that correspond to the Congruent and Incongruent beta weights, you can use</p>
+</div>
+<p>3dinfo.</p>
+<p>And then extract them with 3dROIstats:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span>hemi<span class="w"> </span><span class="k">in</span><span class="w"> </span>lh<span class="w"> </span>rh<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Extracting Congruent beta weights for </span><span class="si">${</span><span class="nv">hemi</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span>3dROIstats<span class="w"> </span>-quiet<span class="w"> </span>-mask<span class="w"> </span>ConflictROI_<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="w"> </span><span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>_Congruent_Betas.niml.dset
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Extracting Incongruent beta weights for </span><span class="si">${</span><span class="nv">hemi</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span>3dROIstats<span class="w"> </span>-quiet<span class="w"> </span>-mask<span class="w"> </span>ConflictROI_<span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>.niml.dset<span class="w"> </span><span class="si">${</span><span class="nv">hemi</span><span class="si">}</span>_Incongruent_Betas.niml.dset
+<span class="k">done</span>
+</pre></div>
+</div>
+<p>If this is done correctly, you should see a significant effect of Incongruent-Congruent in the
+right hemisphere, but not in the left hemisphere. This is another advantage of surface-based
+analyses: You are able to better discern where exactly in the brain the activation is located.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When performing the same t-test across both hemispheres, be sure to divide the p-value by 2 to</p>
+</div>
+<p>account for multiple comparisons.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cc05.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

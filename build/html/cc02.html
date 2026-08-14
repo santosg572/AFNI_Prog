@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SUMA Tutorial #2: @SUMA_Make_Spec_FS and @SUMA_AlignToExperiment &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="suma-tutorial-2-suma-make-spec-fs-and-suma-aligntoexperiment">
+<h1>SUMA Tutorial #2: &#64;SUMA_Make_Spec_FS and &#64;SUMA_AlignToExperiment<a class="headerlink" href="#suma-tutorial-2-suma-make-spec-fs-and-suma-aligntoexperiment" title="Link to this heading">¶</a></h1>
+<p><strong>Overview</strong></p>
+<p>Once you have reconstructed the cortical surfaces, you can use SUMA commands to align those
+surfaces to the original anatomical image. The command &#64;SUMA_Make_Spec_FS will create a new surface
+file that can be read by SUMA, and &#64;SUMA_AlignToExperiment will register the surface to your
+anatomical dataset. Once you have the output from these commands, you can use them with the
+afni_proc.py command to create a surface-based analysis script.</p>
+<p><strong>SUMA_Make_Spec_FS</strong></p>
+<p>The command &#64;SUMA_Make_Spec_FS can either be run directly in the surf directory created by
+FreeSurfer’s recon-all command, or you can specify the path using the -fspath option. In either
+case, in the surf directory a new directory called SUMA will be created.</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="nv">FLANKER_DIR</span><span class="o">=</span>/Users/<span class="nv">$USER</span>/Desktop/Flanker
+<span class="nv">FS_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">FLANKER_DIR</span><span class="si">}</span>/FS
+
+<span class="k">for</span><span class="w"> </span>subj<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="sb">`</span>cat<span class="w"> </span>subjList.txt<span class="sb">`</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span>@SUMA_Make_Spec_FS<span class="w"> </span>-sid<span class="w"> </span><span class="si">${</span><span class="nv">subj</span><span class="si">}</span><span class="w"> </span>-fspath<span class="w"> </span><span class="si">${</span><span class="nv">FS_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">subj</span><span class="si">}</span>_T1w/surf
+<span class="k">done</span>
+</pre></div>
+</div>
+<p>This will take around 20-30 minutes per subject.</p>
+<p><strong>SUMA_AlignToExperiment</strong></p>
+<p>The next step is to align the anatomical image to the surfaces that were generated with
+&#64;SUMA_Make_Spec_FS. Navigate to one of your subject’s directories, e.g. sub-01/anat, and type the
+following:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>@SUMA_AlignToExperiment<span class="w"> </span>-exp_anat<span class="w"> </span>sub-01_T1w.nii.gz<span class="w"> </span>-surf_anat<span class="w"> </span>../../FS/sub-01_T1w/surf/SUMA/sub-01_SurfVol+orig<span class="w"> </span>-align_centers
+</pre></div>
+</div>
+<p>The -align_centers option is useful if the volume and the surfaces start out in very different
+locations, making it difficult to estimate an initial starting point for the alignment.</p>
+<p>I have found that &#64;SUMA_AlignToExperiment doesn’t lead to results that are any different from the
+SurfVol image generated in the SUMA directory after running &#64;SUMA_Make_Spec_FS. I have also found
+that it causes worse alignments in some cases. I will omit them from further steps in this
+tutorial, until I find out how to make it work successfully.</p>
+<p><strong>Viewing the Alignment</strong></p>
+<p>If you are in the directory FS/sub-01_T1w/surf/SUMA, You can then view the alignment by typing:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>afni<span class="w"> </span>-niml<span class="w"> </span><span class="p">&amp;</span>
+suma<span class="w"> </span>-spec<span class="w"> </span>std.141.sub-01_both.spec<span class="w"> </span>-sv<span class="w"> </span>sub-01_SurfVol+orig.HEAD
+</pre></div>
+</div>
+<p>This will open both the volumetric anatomical image in the AFNI viewer, and the surfaces in the
+SUMA viewer. Once both viewers are open, click on the SUMA viewer and press t (for the viewers to
+“talk” to each other). If you left-click around the volumetric viewer you should see the cursor on
+the surface viewer update with the location where you are currently pointing, and vice-versa if you
+right-click on the surface image in the SUMA viewer.</p>
+<p>In the volumetric window, the pial surface (i.e., the edge of the grey matter) will be traced in
+blue in the left hemisphere, and in pink in the right hemisphere. The white matter surface (i.e.,
+the edge separating the white matter from the grey matter) will be traced in red in the left
+hemisphere, and in a different shade of pink in the right hemisphere. Check to make sure that these
+lines accurately trace the surface boundaries. There may be some minor errors depending on whether
+the FreeSurfer surfaces were edited, but they shouldn’t have a significant effect on the location
+of your surface activations.</p>
+<p>../../../_images/09_02_SUMA_Viewer_Demo.gif</p>
+<p><strong>Exercises</strong></p>
+<p>1. Look at all of the aligned images that have been generated by &#64;SUMA_Make_Spec_FS. Do you see any
+inconsistencies?</p>
+<p>2. When you right-click and drag the cursor around the surface image, do you ever see the
+crosshairs
+in the volumetric image go into the white matter? Why or why not?</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cc02.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

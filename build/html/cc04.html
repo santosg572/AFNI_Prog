@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SUMA Tutorial #4: Group Analysis &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="suma-tutorial-4-group-analysis">
+<h1>SUMA Tutorial #4: Group Analysis<a class="headerlink" href="#suma-tutorial-4-group-analysis" title="Link to this heading">¶</a></h1>
+<p>As with our group analysis of the volumetric data, we can average the contrast estimates over all
+of our subjects and display them on a template brain. See the last tutorial for instructions on how
+to download and unpack this template brain if you have not already done so.</p>
+<p>We can adapt the same uber_ttest.py script we created during the volumetric group analyses to
+analyze the surface data, making sure to append the string .niml.dset to the output in order to
+indicate that it is a surface file that can be read by SUMA. The framework of the t-test is the
+same: We load each subject’s statistics file and specify the sub-brik that we want to contrast. (If
+you recall from viewing the individual subject results, sub-brik #10 represents the contrast
+estimate for Incongruent-Congruent.) We then do this for both the left and right hemispheres, since
+we have run separate GLMs for each side of the brain:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#Left Hemisphere</span>
+
+<span class="nb">set</span><span class="w"> </span><span class="nv">dirA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$PWD</span>
+
+<span class="c1"># specify and possibly create results directory</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">results_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>test.results
+<span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="w"> </span>!<span class="w"> </span>-d<span class="w"> </span><span class="nv">$results_dir</span><span class="w"> </span><span class="o">)</span><span class="w"> </span>mkdir<span class="w"> </span><span class="nv">$results_dir</span>
+
+<span class="c1"># ------------------------- process the data -------------------------</span>
+
+3dttest++<span class="w"> </span>-prefix<span class="w"> </span><span class="nv">$results_dir</span>/Flanker_Inc-Con_ttest.lh.niml.dset<span class="w">               </span><span class="se">\</span>
+<span class="w">     </span>-setA<span class="w"> </span>Inc-Con<span class="w">                                            </span><span class="se">\</span>
+<span class="w">        </span><span class="m">01</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-01/sub-01.results_SUMA/stats.sub-01.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">02</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-02/sub-02.results_SUMA/stats.sub-02.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">03</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-03/sub-03.results_SUMA/stats.sub-03.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">04</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-04/sub-04.results_SUMA/stats.sub-04.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">05</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-05/sub-05.results_SUMA/stats.sub-05.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">06</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-06/sub-06.results_SUMA/stats.sub-06.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">07</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-07/sub-07.results_SUMA/stats.sub-07.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">08</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-08/sub-08.results_SUMA/stats.sub-08.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">09</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-09/sub-09.results_SUMA/stats.sub-09.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">10</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-10/sub-10.results_SUMA/stats.sub-10.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">11</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-11/sub-11.results_SUMA/stats.sub-11.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">12</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-12/sub-12.results_SUMA/stats.sub-12.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">13</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-13/sub-13.results_SUMA/stats.sub-13.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">14</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-14/sub-14.results_SUMA/stats.sub-14.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">15</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-15/sub-15.results_SUMA/stats.sub-15.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">16</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-16/sub-16.results_SUMA/stats.sub-16.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">17</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-17/sub-17.results_SUMA/stats.sub-17.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">18</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-18/sub-18.results_SUMA/stats.sub-18.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">19</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-19/sub-19.results_SUMA/stats.sub-19.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">20</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-20/sub-20.results_SUMA/stats.sub-20.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">21</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-21/sub-21.results_SUMA/stats.sub-21.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">22</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-22/sub-22.results_SUMA/stats.sub-22.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">23</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-23/sub-23.results_SUMA/stats.sub-23.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">24</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-24/sub-24.results_SUMA/stats.sub-24.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">25</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-25/sub-25.results_SUMA/stats.sub-25.lh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">26</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-26/sub-26.results_SUMA/stats.sub-26.lh.niml.dset[10]&quot;</span>
+
+<span class="c1">#Right Hemisphere</span>
+
+<span class="w"> </span>3dttest++<span class="w"> </span>-prefix<span class="w"> </span><span class="nv">$results_dir</span>/Flanker_Inc-Con_ttest.rh.niml.dset<span class="w">               </span><span class="se">\</span>
+<span class="w">     </span>-setA<span class="w"> </span>Inc-Con<span class="w">                                            </span><span class="se">\</span>
+<span class="w">        </span><span class="m">01</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-01/sub-01.results_SUMA/stats.sub-01.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">02</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-02/sub-02.results_SUMA/stats.sub-02.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">03</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-03/sub-03.results_SUMA/stats.sub-03.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">04</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-04/sub-04.results_SUMA/stats.sub-04.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">05</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-05/sub-05.results_SUMA/stats.sub-05.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">06</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-06/sub-06.results_SUMA/stats.sub-06.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">07</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-07/sub-07.results_SUMA/stats.sub-07.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">08</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-08/sub-08.results_SUMA/stats.sub-08.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">09</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-09/sub-09.results_SUMA/stats.sub-09.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">10</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-10/sub-10.results_SUMA/stats.sub-10.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">11</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-11/sub-11.results_SUMA/stats.sub-11.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">12</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-12/sub-12.results_SUMA/stats.sub-12.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">13</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-13/sub-13.results_SUMA/stats.sub-13.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">14</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-14/sub-14.results_SUMA/stats.sub-14.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">15</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-15/sub-15.results_SUMA/stats.sub-15.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">16</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-16/sub-16.results_SUMA/stats.sub-16.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">17</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-17/sub-17.results_SUMA/stats.sub-17.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">18</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-18/sub-18.results_SUMA/stats.sub-18.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">19</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-19/sub-19.results_SUMA/stats.sub-19.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">20</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-20/sub-20.results_SUMA/stats.sub-20.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">21</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-21/sub-21.results_SUMA/stats.sub-21.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">22</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-22/sub-22.results_SUMA/stats.sub-22.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">23</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-23/sub-23.results_SUMA/stats.sub-23.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">24</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-24/sub-24.results_SUMA/stats.sub-24.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">25</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-25/sub-25.results_SUMA/stats.sub-25.rh.niml.dset[10]&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span><span class="m">26</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dirA</span><span class="s2">/sub-26/sub-26.results_SUMA/stats.sub-26.rh.niml.dset[10]&quot;</span>
+</pre></div>
+</div>
+<p>Once this code has been run, you can view the results on the surface template, opening a new viewer
+for each hemisphere (and making sure that the -spec file matches the hemisphere you are viewing):</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>suma<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_rh.spec<span class="w"> </span>-sv<span class="w"> </span>suma_MNI_N27/MNI_N27_SurfVol.nii<span class="w"> </span>-input<span class="w"> </span>Flanker_Inc-Con_ttest.rh.niml.dset
+
+suma<span class="w"> </span>-spec<span class="w"> </span>suma_MNI_N27/std.141.MNI_N27_lh.spec<span class="w"> </span>-sv<span class="w"> </span>suma_MNI_N27/MNI_N27_SurfVol.nii<span class="w"> </span>-input<span class="w"> </span>Flanker_Inc-Con_ttest.lh.niml.dset
+</pre></div>
+</div>
+<p>If you compare the surface results to the volumetric results, you will see that a significant
+effect of Inc-Con is in roughly the same area: The pre-supplementary motor area, or pre-SMA.
+However, the surface results are stronger (a peak t-statistic in the right hemisphere of 5.079
+compared to 4.44 for the volumetric results, for example), and you are able to see where the
+activation traces the gyri and sulci of the brain. The surface-based figures not only look better,
+but allow you to see more nuances in the data as well.</p>
+<p>../../../_images/09_04_Surface_Volumetric_Results.png</p>
+<p><strong>Multiple Comparisons Correction</strong></p>
+<p>As with the volumetric analysis, we will need to correct for the number of vertices in our dataset
+(as opposed to the number of voxels). The commands needed to run a cluster simulation on the
+surface are more involved; similar to how we created an entire preprocessing script with
+uber_subject.py, we will create a cluster correction script with slow_surf_clustsim.py (note that
+this should be done for both hemispheres):</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>slow_surf_clustsim.py<span class="w"> </span>-save_script<span class="w"> </span>surf.clustsim.001<span class="w"> </span>-uvar<span class="w"> </span>spec_file
+suma_MNI_N27/std.141.MNI_N27_lh.spec<span class="w"> </span><span class="se">\</span>
+<span class="w"> </span>-uvar<span class="w"> </span>surf_vol<span class="w"> </span>suma_MNI_N27/MNI_N27_SurfVol.nii<span class="w"> </span>-uvar<span class="w"> </span>blur<span class="w"> </span><span class="m">4</span>.0<span class="w"> </span>-on_surface<span class="w"> </span>yes<span class="w"> </span>-uvar<span class="w"> </span>pthr_list
+<span class="m">0</span>.001<span class="w"> </span><span class="se">\</span>
+<span class="w"> </span>-uvar<span class="w"> </span>results_dir<span class="w"> </span>clust.results.001
+</pre></div>
+</div>
+<p>And then run the output script:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>tcsh<span class="w"> </span>surf.clustsim
+</pre></div>
+</div>
+<p>This script can take a while; the total processing time may be 60-90 minutes, depending on the
+speed of your machine.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Does the Eklund et al. 2016 paper apply to surface results? According to the FreeSurfer</p>
+</div>
+<p>developers,
+analyses of the structural data also showed the same bias towards higher smoothness than was
+expected by their cluster simulations, indicating the need for a cluster-defining threshold of
+p=0.001 or stricter in order for the cluster simulations to be accurate. I haven’t read whether the
+same problems apply to the functional data used with SUMA, but to be on the safe side, use a
+cluster-defining p-threshold of p=0.001.</p>
+<p>This script will generate z max images. To find the corresponding alpha p=0.05 value for an
+cluster-defining p-value of p=0.001, for example, type:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>quick.alpha.vals.py<span class="w"> </span>-niter<span class="w"> </span><span class="m">1000</span><span class="w"> </span>z.max.area.0.001
+</pre></div>
+</div>
+<p>Which will return two columns: the number of vertices, in square millimeters, on the left; and the
+corresponding corrected p-threshold on the right. Scroll down until you find the number of vertices
+corresponding to a corrected p-threshold of 0.05, and then threshold this number of vertices in the
+SUMA viewer. Whichever clusters remain will be statistically significant.</p>
+<p>You can then view these clusters in the SUMA viewer by loading the statistics dataset onto the
+template, and setting the p-threshold slider to your cluster-defining p-threshold. (Note: You can
+set the p-threshold exactly by clicking in the field above the p-threshold slider and entering
+0.001p to set a vertex-wise p-threshold of p=0.001, for example.) In the fields next to Clst in the
+bottom right of the control panel, enter the cluster-corrected threshold in the box underneath
+Area. For example, if we found that we need at least 110 contiguous vertices to be a statistically
+significant cluster, you would enter this into the field.</p>
+<p>Then click on the Clst string to activate the interactive Clusterize feature, which will leave in
+the image only those clusters that pass the threshold. A table of the significant clusters will be
+printed to your Terminal; right click on the clusters in the viewing window to see which cluster is
+centered at your cross-hairs, and match this up with the cluster “# Rank” in the table. You should
+see something like the figure below:</p>
+<p>../../../_images/09_04_ClusterCorrection.png</p>
+<p><strong>Exercises</strong></p>
+<p>1. Switch between the different surface views using the , and . keys. In the right hemisphere, it
+appears that there is a significant cluster in the pre-SMA, and also in the cingulate sulcus; take
+a screenshot of a view that is oriented to best capture both of these effects.</p>
+<p>2. Re-run the t-tests, this time using 3dMEMA with the REML results from the surface analysis. How
+do
+they differ from the non-REML analysis? Is it similar to the difference you observed between the
+REML and non-REML analyses with the volumetric data?</p>
+<p>3. Re-run the surface analyses using a larger smoothing kernel, such as 10mm or 15mm. How do the
+results change? Do you think it is appropriate to use a larger smoothing kernel in this case? Why
+or why not?</p>
+<p>4. See this page for a summary of what all the different SUMA buttons do, noting the similarity
+between them and the AFNI controller. Experiment with different color maps, opacities, and viewing
+options.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cc04.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

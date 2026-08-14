@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SUMA Tutorial #3: Analysis on the Surface &#8212; Numerical_Analysis_2E_Walter 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=877ede6b" />
+    <script src="_static/documentation_options.js?v=f2a433a1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="suma-tutorial-3-analysis-on-the-surface">
+<h1>SUMA Tutorial #3: Analysis on the Surface<a class="headerlink" href="#suma-tutorial-3-analysis-on-the-surface" title="Link to this heading">¶</a></h1>
+<p><strong>Overview</strong></p>
+<p>Surface-based analysis has many advantages, which we outlined earlier.</p>
+<p>Once you have prepared the surfaces with &#64;SUMA_Make_Spec_FS and &#64;SUMA_AlignToExperiment, you can
+use the output with afni_proc.py. We will create a template in uber_subject.py, and then make the
+following changes:</p>
+<ol class="arabic simple">
+<li><p>Insert a surf block after the volreg block;</p></li>
+<li><p>Remove the mask block;</p></li>
+</ol>
+<p>3. Remove any references to blur estimation in the regress block (i.e., regress_est_blur_epits and
+regress_est_blur_errts);</p>
+<ol class="arabic simple" start="4">
+<li><p>Add the option -surf_anat which points to the surface anatomical image in the SUMA directory;</p></li>
+</ol>
+<p>5. Add the option -surf_spec which points to the spec files in the SUMA directory. If you want to
+analyze the individual subject’s surface, use the &lt;subjID&gt;_?h.spec files in the SUMA directories
+created by &#64;SUMA_Make_Spec_FS. If you want to do a group analysis in standardized space, use the
+std.141.&lt;subjID&gt;_?h.spec files.</p>
+<p>To create the preprocessing script, a typical afni_proc.py script would look like the following:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env tcsh</span>
+
+<span class="c1"># set subject and group identifiers</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">subj</span><span class="w">  </span><span class="o">=</span><span class="w"> </span>sub-08
+<span class="nb">set</span><span class="w"> </span><span class="nv">gname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>Flanker
+
+<span class="c1"># set data directories</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">top_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>/Users/ajahn/Desktop/<span class="si">${</span><span class="nv">gname</span><span class="si">}</span>/sub-08
+<span class="nb">set</span><span class="w"> </span><span class="nv">anat_dir</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nv">$top_dir</span>/anat
+<span class="nb">set</span><span class="w"> </span><span class="nv">epi_dir</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nv">$top_dir</span>/func
+<span class="nb">set</span><span class="w"> </span><span class="nv">stim_dir</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nv">$top_dir</span>/func
+
+<span class="c1"># run afni_proc.py to create a single subject processing script</span>
+afni_proc.py<span class="w"> </span>-subj_id<span class="w"> </span><span class="nv">$subj</span><span class="w">                                            </span><span class="se">\</span>
+-script<span class="w"> </span>proc.<span class="nv">$subj</span><span class="w"> </span>-scr_overwrite<span class="w">                              </span><span class="se">\</span>
+-blocks<span class="w"> </span>tshift<span class="w"> </span>align<span class="w"> </span>tlrc<span class="w"> </span>volreg<span class="w"> </span>surf<span class="w"> </span>blur<span class="w"> </span>scale<span class="w"> </span>regress<span class="w">       </span><span class="se">\</span>
+-copy_anat<span class="w"> </span><span class="nv">$anat_dir</span>/sub-08_T1w.nii.gz<span class="w">                         </span><span class="se">\</span>
+-dsets<span class="w">                                                         </span><span class="se">\</span>
+<span class="nv">$epi_dir</span>/sub-08_task-flanker_run-1_bold.nii.gz<span class="w">             </span><span class="se">\</span>
+<span class="nv">$epi_dir</span>/sub-08_task-flanker_run-2_bold.nii.gz<span class="w">             </span><span class="se">\</span>
+-tcat_remove_first_trs<span class="w"> </span><span class="m">0</span><span class="w">                                       </span><span class="se">\</span>
+-align_opts_aea<span class="w"> </span>-giant_move<span class="w">                                    </span><span class="se">\</span>
+-tlrc_base<span class="w"> </span>MNI_avg152T1+tlrc<span class="w">                                   </span><span class="se">\</span>
+-volreg_align_to<span class="w"> </span>MIN_OUTLIER<span class="w">                                   </span><span class="se">\</span>
+-volreg_align_e2a<span class="w">                                              </span><span class="se">\</span>
+-volreg_tlrc_warp<span class="w">                                              </span><span class="se">\</span>
+-surf_anat<span class="w"> </span>~/Desktop/Flanker/FS/sub-08_T1w/surf/SUMA/sub-08_SurfVol+orig<span class="w">     </span><span class="se">\</span>
+-surf_spec<span class="w"> </span>~/Desktop/Flanker/FS/sub-08_T1w/surf/SUMA/std.141.sub-08_?h.spec<span class="w">  </span><span class="se">\</span>
+-blur_size<span class="w"> </span><span class="m">4</span>.0<span class="w">                                                 </span><span class="se">\</span>
+-regress_stim_times<span class="w">                                            </span><span class="se">\</span>
+<span class="nv">$stim_dir</span>/congruent.1D<span class="w">                                     </span><span class="se">\</span>
+<span class="nv">$stim_dir</span>/incongruent.1D<span class="w">                                   </span><span class="se">\</span>
+-regress_stim_labels<span class="w"> </span>congruent<span class="w"> </span>incongruent<span class="w">                              </span><span class="se">\</span>
+-regress_basis<span class="w"> </span><span class="s1">&#39;GAM&#39;</span><span class="w">                                         </span><span class="se">\</span>
+-regress_censor_motion<span class="w"> </span><span class="m">0</span>.3<span class="w">                                     </span><span class="se">\</span>
+-regress_motion_per_run<span class="w">                                        </span><span class="se">\</span>
+-regress_opts_3dD<span class="w">                                              </span><span class="se">\</span>
+-jobs<span class="w"> </span><span class="m">8</span><span class="w">                                                    </span><span class="se">\</span>
+-gltsym<span class="w"> </span><span class="s1">&#39;SYM: congruent -incongruent&#39;</span><span class="w"> </span>-glt_label<span class="w"> </span><span class="m">1</span><span class="w"> </span>Con-Inc<span class="w"> </span><span class="se">\</span>
+-gltsym<span class="w"> </span><span class="s1">&#39;SYM: incongruent -congruent&#39;</span><span class="w"> </span>-glt_label<span class="w"> </span><span class="m">2</span><span class="w"> </span>Inc-Con<span class="w"> </span><span class="se">\</span>
+-regress_reml_exec<span class="w">                                             </span><span class="se">\</span>
+-regress_make_ideal_sum<span class="w"> </span>sum_ideal.1D
+</pre></div>
+</div>
+<p>This script would work for analyzing sub-08. To make it generalizable, we will make the same edits
+to the path as we did during the volumetric analysis.</p>
+<p>We will also cut this code (which should be found around lines 218-219):</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># set directory variables</span>
+<span class="nb">set</span><span class="w"> </span><span class="nv">surface_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span>/FS/<span class="si">${</span><span class="nv">subj</span><span class="si">}</span>_T1w/surf/SUMA
+</pre></div>
+</div>
+<p>And paste it around line 35, before we cd into the output directory.</p>
+<p>To download the script that already has these edits, click here. You can then loop it over all of
+your subjects with the following code:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="sb">`</span>cat<span class="w"> </span>subjList.txt<span class="sb">`</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span>tcsh<span class="w"> </span>SUMA_proc_MNI.sh<span class="w"> </span><span class="nv">$i</span><span class="p">;</span>
+<span class="w">  </span>mv<span class="w"> </span><span class="si">${</span><span class="nv">i</span><span class="si">}</span>.results_SUMA<span class="w"> </span><span class="nv">$i</span><span class="p">;</span>
+<span class="k">done</span>
+</pre></div>
+</div>
+<p><strong>Downloading the Surface Template</strong></p>
+<p>Just as with our volumetric analyses, we will need to render our results on a surface template.
+Navigate to the directory containing your subjects, and type the following:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>afni_open<span class="w"> </span>-aw<span class="w"> </span>suma_MNI_N27.tgz
+tar<span class="w"> </span>xvzf<span class="w"> </span>suma_MNI_N27.tgz
+</pre></div>
+</div>
+<p>This will download and unpack the MNI_N27 surface template, which we can then view our results on.</p>
+<p><strong>Loading the First-Level Results</strong></p>
+<p>After the preprocessing script has finished, you will see a list of files output that have names
+similar to the ones you saw during the volumetric analysis. In this case, however, some of the
+files end in suffixes such as niml.dset. These are datasets that can be loaded into SUMA using the
+-input option.</p>
+<p>To load the statistics for the left hemisphere for sub-01, for example, navigate to the directory
+sub-01/sub-01.results_SUMA and type the following:</p>
+<div class="highlight-Bash notranslate"><div class="highlight"><pre><span></span>suma<span class="w"> </span>-spec<span class="w"> </span>../../suma_MNI_N27/std.141.MNI_N27_lh.spec<span class="w"> </span>-sv<span class="w"> </span>sub-01_SurfVol_Alnd_Exp+tlrc<span class="w"> </span>-input<span class="w"> </span>stats.sub-01.lh.niml.dset
+</pre></div>
+</div>
+<p>You can then select the statistic sub-brik you would like to display, and change the p-value
+threshold accordingly.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the results have been normalized to MNI space, then use the code specified above. If you have</p>
+</div>
+<p>processed the data in the subject’s native space and have not normalized the data, then you could
+use the subject’s spec file located in his corresponding surf directory, and change the surface
+volue to &lt;subjName&gt;_SurfVol_Alnd_Exp+orig.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Numerical_Analysis_2E_Walter</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, leopoldo.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/cc03.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
