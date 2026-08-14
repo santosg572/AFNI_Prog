@@ -15,6 +15,7 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Chapter 1: AFNI Commands and uber_subject.py" href="ca01.html" />
     <link rel="prev" title="AFNI Tutorial #3: Looking at the Data" href="c03.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -52,16 +53,12 @@
 <p>Similarly, when we preprocess fMRI data we are cleaning up the three-dimensional images that we acquire every TR. An fMRI volume contains not only the signal that we are interested in - changes in oxygenated blood - but also fluctuations that we are not interested in, such as head motion, random drifts, breathing, and heartbeats. We call these other fluctuations noise, since we want to separate them from the signal that we are interested in. Some of these can be regressed out of the data by modeling them (which is discussed in the chapter on modeling fitting), and others can be reduced or removed by preprocessing.</p>
 <p>To begin preprocessing sub-08’s data, read through the following chapters. We will begin with an overview of how to use AFNI commands, and then introduce uber_subject.py, which allows you to write a script that will do all of the preprocessing for you. You will then learn about why each of these preprocessing steps are done, and how to check the data quality before and after each step.</p>
 <p><strong>Preprocessing Steps</strong></p>
-<blockquote>
-<div><p>Chapter 1: AFNI Commands and uber_subject.py
-Intermezzo: Running the Uber Subject Script
-Chapter 2: Slice-Timing Correction
-Chapter 3: Registration and Normalization
-Chapter 4: Alignment and Motion Correction
-Chapter 5: Smoothing
-Chapter 6: Masking and Scaling
-Chapter 7: Checking Preprocessing</p>
-</div></blockquote>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ca01.html">Chapter 1: AFNI Commands and uber_subject.py</a></li>
+</ul>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Different software packages will do these steps in slightly different order - for example, FSL will normalize the statistical maps after model fitting. There are also analyses which omit certain steps - for example, some people who do multi-voxel pattern analyses don’t smooth their data. In any case, the list above represents the most common steps that are performed on a typical dataset.</p>
@@ -96,18 +93,23 @@ Chapter 7: Checking Preprocessing</p>
 <script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="intro.html">What is AFNI?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro2.html">Introduction to AFNI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="c02.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="c03.html">AFNI Tutorial #3: Looking at the Data</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="intro.html">What is AFNI?</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro2.html">Introduction to AFNI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c02.html">AFNI Tutorial #2: The Flanker Experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c03.html">AFNI Tutorial #3: Looking at the Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AFNI Tutorial #4: AFNI Commands and Preprocessing</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="intro.html">What is AFNI?</a><ul>
       <li>Previous: <a href="c03.html" title="previous chapter">AFNI Tutorial #3: Looking at the Data</a></li>
+      <li>Next: <a href="ca01.html" title="next chapter">Chapter 1: AFNI Commands and uber_subject.py</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
