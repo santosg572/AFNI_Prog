@@ -17,5 +17,8 @@ The following tutorials will show you how to analyze a sample dataset with AFNI.
    :caption: Contents:
 
    intro2
-
+   c01
+   c02   
+   c03
+   c04
 
